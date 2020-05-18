@@ -7,7 +7,7 @@ set(0,'DefaultFigureWindowStyle','docked');
 %% Model Jaco arm
 scale = 0.5;
 jacoBase = transl(-0.2, 0.4,0.2);
-qHomePose = zeros(1,5);                  %Change joint angles accordingly
+qHomePose = zeros(1,6);                  %Change joint angles accordingly
 
 %Get robot arm 
 robot = Jaco;                            %Calling the Jaco class
