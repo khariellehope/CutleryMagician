@@ -11,10 +11,12 @@ qHomePose = zeros(1,6);                  %Change joint angles accordingly
 
 %Get robot arm 
 robot = Jaco;                            %Calling the Jaco class
-Jaco.GetJacoRobot();                     %Calling the 'GetJacoRobot' function from class - This function creates the model using dh parameters
-Jaco.model.base = jacoBase;              %Set base position
-Jaco.model.plot(qHomePose, 'scale', scale, 'workspace', robot.workspace);      %Plot model         
-
+robot.GetJacoRobot();                     %Calling the 'GetJacoRobot' function from class - This function creates the model using dh parameters
+robot.PlotAndColourRobot();               %Use ply files to model realistic Jaco Robot
+robot.model.base = jacoBase;              %Set base position
+robot.model.plotopt = {'nojoints', 'noname', 'noshadow','nowrist'};
+robot.model.plot(qHomePose, 'scale', scale, 'workspace', robot.workspace);      %Plot model         
+hold on;
 
 % use switch case for determining movement of robot/end effector to box
 % depending on which cutlery was picked up
@@ -40,6 +42,9 @@ Jaco.model.plot(qHomePose, 'scale', scale, 'workspace', robot.workspace);      %
 % hold on;
 
 %Using environment function:
+xOffset = 0;
+yOffset = 0;
+zOffset = -0.5;
 partMesh = Environment('kitchen.ply', xOffset, yOffset, zOffset);
 benchMesh_h = partMesh;
 hold on;
@@ -49,7 +54,7 @@ x = [2 -2.5; 2 -2.5];
 y = [2 2; -2.5 -2.5];
 z = [-0.6 -0.6; -0.6 -0.6];
 
-floor_h = background('floor.jpg', x, y, z);
+floor_h = background('floor.jpeg', x, y, z);
 
 %Window Wall
 x = [1.1 -2.5; 1.1 -2.5];
