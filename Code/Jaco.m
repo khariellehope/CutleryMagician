@@ -1,7 +1,7 @@
 classdef Jaco < handle
     properties
         model;
-        workspace = [-2 2 -2 2 0 2];
+        workspace = [-2 2 -2 2 0 1];
         toolModelFileName = []; %For importing model of robot if files available 
     end
     
@@ -37,9 +37,9 @@ classdef Jaco < handle
         function PlotAndColourRobot(self)
 
         for linkIndex = 0:self.model.n
-            [ faceData, vertexData, plyData{linkIndex + 1} ] = plyread(['JacoLink', num2str(linkIndex),'.ply'],'tri'); 
-            self.model.faces{linkIndex + 1} = faceData;
-            self.model.points{linkIndex + 1} = vertexData;
+                [ faceData, vertexData, plyData{linkIndex + 1} ] = plyread(['JacoLink',num2str(linkIndex),'.ply'],'tri'); 
+                self.model.faces{linkIndex + 1} = faceData;
+                self.model.points{linkIndex + 1} = vertexData;
         end
 
         %Display

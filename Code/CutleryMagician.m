@@ -5,7 +5,7 @@ clear all
 set(0,'DefaultFigureWindowStyle','docked');
 
 %% Model Jaco arm
-scale = 0.5;
+scale = 0.1;
 jacoBase = transl(-0.2, 0.4,0.2);
 qHomePose = zeros(1,6);                  %Change joint angles accordingly
 
