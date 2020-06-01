@@ -22,7 +22,7 @@ hold on;
 % depending on which cutlery was picked up
 
 
-%%Import Environment
+%% Import Environment
 
 %Kitchen Bench
 
@@ -52,11 +52,18 @@ partMesh = Environment('Container3.ply', containerThreeLoc(1,4), containerThreeL
 containerThreeMesh_h = partMesh;
 hold on;
 
+%Safety Features - i.e eStop, encasing, 
+eStopLoc = transl(0.6, 1, 0.2);             %Location needs to be fixed up, this is a random number
+
+%partMesh = Environment('eStop.ply', eStopLoc(1,4), eStopLoc(2,4),
+%eStopLoc(3,4));
+%eStopMesh_h = partMesh;
+%hold on;
+
 %Floor
 x = [2 -2.5; 2 -2.5];
 y = [2 2; -2.5 -2.5];
 z = [-0.5 -0.5; -0.5 -0.5];
-
 floor_h = background('floor.jpeg', x, y, z);
 
 %Window Wall
@@ -84,13 +91,17 @@ knifeMesh_h = partMesh;
 
 %% Collision avoidance?
 %Check for collision with barrier or container(s)??
+
+% Create collision points i.e. 
+
 %if collision == 1, then stop robot, if =0; continue movement
-% collision checking should be done within movement section????
+% collision checking should be done within movement section???? qMatrix
+% depends on the movement of robot
 
 collisionStatus = CheckForCollision(robot, qMatrix, vertex, faces, faceNormals);
 if collisionStatus == 1
   display('Collision Detected!!! Robot has paused');
-  while collisionStatus = 1
+  while collisionStatus == 1
   pause(1);
   end
 end
@@ -98,6 +109,19 @@ end
 
 
 %% Sensor data?
+
+%% Estop Check
+%This should be put within the movement function later. ie Check for estop
+%and collisions before robot arm moves
+
+if eStopPressed ~= 0
+    display('EMERGENCY STOP');
+    while eStopPressed ~= 0
+        pause(1);
+    end
+    
+end
+
 
 %% Movement
 %Testing movement of arm from cutlery to containers. Will be changed to
@@ -140,3 +164,14 @@ for i = 1:steps
     qMatrix(i,:) = (1-s(i))*qContainerOne + s(i)*qHomePose;
     robot.model.animate(qMatrix(i,:));
 end
+
+%% GUI Functions
+function UpdateJointAngle(robot, joint,angle)
+    qGUI(1,joint) = deg2rad(angle);
+    
+
+    robot.model.animate(qGUI);
+
+end
+
+
