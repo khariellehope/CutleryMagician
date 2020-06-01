@@ -22,8 +22,7 @@ hold on;
 % depending on which cutlery was picked up
 
 
-%%
-% Import Environment
+%%Import Environment
 
 %Kitchen Bench
 
@@ -84,7 +83,19 @@ knifeMesh_h = partMesh;
 
 
 %% Collision avoidance?
-%Check for collision with barrier/box or container(s)??
+%Check for collision with barrier or container(s)??
+%if collision == 1, then stop robot, if =0; continue movement
+% collision checking should be done within movement section????
+
+collisionStatus = CheckForCollision(robot, qMatrix, vertex, faces, faceNormals);
+if collisionStatus == 1
+  display('Collision Detected!!! Robot has paused');
+  while collisionStatus = 1
+  pause(1);
+  end
+end
+
+
 
 %% Sensor data?
 
