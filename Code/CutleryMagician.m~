@@ -6,7 +6,7 @@ set(0,'DefaultFigureWindowStyle','docked');
 
 % Model Jaco arm
 scale = 0.1;
-jacoBase = transl(1, 1,0.25);
+jacoBase = transl(1.25, 1.25,0.25);
 qHomePose = [pi/180,0,0,0,0,0];                  %Change joint angles accordingly
 
 %Get robot arm 
@@ -91,7 +91,6 @@ knifeMesh_h = partMesh;
 %% Movement
 %Testing movement of arm from cutlery to containers. Will be changed to
 %switch cases when sensor is added 
-%EE stands for end effector 
 
 steps = 50;
 s = lspb(0,1,steps); %Scalar function
@@ -103,7 +102,7 @@ qMatrix = nan(steps, 6); %Memory allocation
 %     robot.model.animate(qMatrix(i,:));
 % end
 
-%Pick up Spoon - HomePose to SpoonLoc, Spoon Loc to containerOne
+%Pick up Spoon - HomePose to SpoonLoc
 
 qSpoon = robot.model.ikcon(spoonLoc);
 
@@ -112,20 +111,7 @@ for i = 1:steps
     robot.model.animate(qMatrix(i,:));
 end
 
-qContainerOne = robot.model.ikcon(containerOneLoc);
 
-for i = 1:steps
-    qMatrix(i,:) = (1-s(i))*qSpoon + s(i)*qContainerOne;
-    robot.model.animate(qMatrix(i,:));
-    
-%     Spoon model being brought to container    
-%     spoonEE = robot.model.fkine(qMatrix(i,:))*transl(0, 0, 0.05);
-%     updatedPoints = ///
-end
 
-%Return to Home
 
-for i = 1:steps
-    qMatrix(i,:) = (1-s(i))*qContainerOne + s(i)*qHomePose;
-    robot.model.animate(qMatrix(i,:));
-end
+

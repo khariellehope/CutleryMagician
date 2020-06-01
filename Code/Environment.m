@@ -8,5 +8,5 @@ function partMesh = Environment(object, xOffset, yOffset, zOffset)
     % Plots the trisurf with the offset for each vertex
     partMesh = trisurf(f,v(:,1) + xOffset,v(:,2) + yOffset, v(:,3) + zOffset ...
       ,'FaceVertexCData',vertexColours,'EdgeColor','interp','EdgeLighting','flat');
-
+   
 end

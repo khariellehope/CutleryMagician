@@ -16,7 +16,7 @@ classdef Jaco < handle
               end
          end
              
-    %These DH Parameters are from the Kinova Robotics User Guide
+    %The DH Parameters are from the Kinova RObotics
         function GetJacoRobot(self)
 
         pause(0.001);
