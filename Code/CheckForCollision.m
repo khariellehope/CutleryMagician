@@ -1,28 +1,39 @@
-function collisionStatus = CheckForCollision(robot, qMatrix, vertex, faces, faceNormals) %Checks for collisions with containers
-%This part of the code was made using code from Lab 5 Solutions
-collisionStatus = 0;
+function [collisionStatus, transform] = CheckForCollision(robot, qMatrix, vertex, faces, faceNormals, returnOnceFound) %Checks for collisions with containers
+%This part of the code was made using code from Lab 5 Solutions and the
+%IsCollision.m file
 
-% 2.4: Get the transform of every joint (i.e. start and end of every link)
-tr = zeros(4,4,robot.model.n+1);
-tr(:,:,1) = robot.model.base;
-Links = robot.model.links;
-for i = 1 : robot.model.n
-    tr(:,:,i+1) = tr(:,:,i) * trotz(qMatrix(i)+Links(i).offset) * transl(0,0,Links(i).d) * transl(Links(i).a,0,0) * trotx(Links(i).alpha);
+if nargin < 6
+    returnOnceFound = true;
 end
+collisionStatus = 0;            %Set status flag as 0 first - Without this, the flag was always 
 
-% 2.5: Go through each link and also each triangle face
-for i = 1 : size(tr,3)-1    
-    for faceIndex = 1:size(faces,1)
-        vertOnPlane = vertex(faces(faceIndex,1)',:);
-        [intersectP,check] = LinePlaneIntersection(faceNormals(faceIndex,:),vertOnPlane,tr(1:3,4,i)',tr(1:3,4,i+1)'); 
-        if check == 1 && IsIntersectionPointInsideTriangle(intersectP,vertex(faces(faceIndex,:)',:))
-            collisionStatus = 1;
-        else
-            collisionStatus = 0;    
-        end
-    end    
+for qIndex = 1:size(qMatrix,1)
+
+    % Get the transform of every joint (i.e. start and end of every link)  
+%     tr = GetLinkPoses(qMatrix(qIndex,:), robot);
+    transform = zeros(4,4,robot.model.n+1);
+    transform(:,:,1) = robot.model.base;
+    Links = robot.model.links;
+    for i = 1 : robot.model.n
+        transform(:,:,i+1) = transform(:,:,i) * trotz(qMatrix(i)+Links(i).offset) * transl(0,0,Links(i).d) * transl(Links(i).a,0,0) * trotx(Links(i).alpha);
+    end
+
+    % Go through each link and also each triangle face
+    for i = 1 : size(transform,3)-1    
+        for faceIndex = 1:size(faces,1)
+            vertOnPlane = vertex(faces(faceIndex,1)',:);
+            [intersectP,check] = LinePlaneIntersection(faceNormals(faceIndex,:),vertOnPlane,transform(1:3,4,i)',transform(1:3,4,i+1)'); 
+            if check == 1 && IsIntersectionPointInsideTriangle(intersectP,vertex(faces(faceIndex,:)',:))
+                plot3(intersectP(1),intersectP(2),intersectP(3),'g*');
+                display('Intersection');
+                collisionStatus = 1;
+            if returnOnceFound
+                    return
+                end                 
+            end
+        end    
+    end
 end
-
 end
 
 %% IsIntersectionPointInsideTriangle
@@ -60,4 +71,5 @@ end
 
 result = 1;                      % intersectP is in Triangle
 end
+
 
