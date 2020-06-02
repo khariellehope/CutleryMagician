@@ -6,8 +6,8 @@ set(0,'DefaultFigureWindowStyle','docked');
 
 % Model Jaco arm
 scale = 0.1;
-jacoBase = transl(1, 1,0.25);
-qHomePose = [pi/180,0,0,0,0,0];                  %Change joint angles accordingly
+jacoBase = transl(1.5, 1,0.25)*trotz(pi);
+qHomePose = [0 pi/2 pi/2 0 pi 0];                  %Change joint angles accordingly
 
 %Get robot arm 
 robot = Jaco;                            %Calling the Jaco class
@@ -74,9 +74,9 @@ window_h = background('windowWall.jpg', x, y, z);
 
 %% Import Cutlery
 
-spoonLoc = transl(1.3, 1, 0.25);
-forkLoc = transl(1.4, 1, 0.25);
-knifeLoc = transl(1.5, 1, 0.25);
+spoonLoc = transl(1.2, 1, 0.25);
+forkLoc = transl(1.3, 1, 0.25);
+knifeLoc = transl(1.4, 1, 0.25);
 
 partMesh = Environment('Spoon.ply', spoonLoc(1,4), spoonLoc(2,4), spoonLoc(3,4));
 spoonMesh_h = partMesh; 
@@ -106,8 +106,47 @@ if collisionStatus == 1
   end
 end
 
+%% Check workspace area
+%Want to see workspace area to see if all the items are within the arms
+%reach 
+
+stepRads = deg2rad(3);
+qlim = robot.model.qlim;
+
+pointCloudeSize = prod(floor((qlim(1:5,2)-qlim(1:5,1))/stepRads +1))
+pointCloud = zeros(pointCloudeSize,3);
+counter = 1;
+
+message = msgbox('Calculating Jaco workspace area');
+
+for q1 = qlim(1,1):stepRads:qlim(1,2)
+    for q2 = qlim(2,1):stepRads:qlim(2,2)
+        for q3 = qlim(3,1):stepRads:qlim(3,2)
+            for q4 = qlim(4,1):stepRads:qlim(4,2)
+                for q5 = qlim(5,1):stepRads:qlim(5,2)
+                    for q6 = 0
+                    q = [q1,q2,q3,q4,q5,q6];
+                    tr = robot.model.fkine(q);
+                    pointCloud(counter,:) = tr(1:3,4)';
+                    counter = counter + 1;
+                    end
+                end
+            end
+        end
+    end
+end
+
+[maxReach, workspaceVol] = convhull(pointCloud);
+
+hold on 
+
+maxReach = plot3(pointCloud(maxReach,1),pointCloud(maxReach,2),pointCloud(maxReach,3),'r.');
 
 
+msg = msgbox('Calculations complete, code paused');
+
+pause();
+delete(maxReach);
 %% Sensor data?
 
 %% Estop Check
@@ -141,27 +180,31 @@ qMatrix = nan(steps, 6); %Memory allocation
 %Pick up Spoon - HomePose to SpoonLoc, Spoon Loc to containerOne
 
 qSpoon = robot.model.ikcon(spoonLoc);
+qContainerOne = robot.model.ikcon(containerOneLoc);
+qContainerTwo = robot.model.ikcon(containerTwoLoc);
+qContainerThree = robot.model.ikcon(containerThreeLoc);
+
 
 for i = 1:steps
     qMatrix(i,:) = (1-s(i))*qHomePose + s(i)*qSpoon;
     robot.model.animate(qMatrix(i,:));
 end
 
-qContainerOne = robot.model.ikcon(containerOneLoc);
 
 for i = 1:steps
-    qMatrix(i,:) = (1-s(i))*qSpoon + s(i)*qContainerOne;
+    qMatrix(i,:) = (1-s(i))*qSpoon + s(i)*qContainerThree;
     robot.model.animate(qMatrix(i,:));
     
 %     Spoon model being brought to container    
 %     spoonEE = robot.model.fkine(qMatrix(i,:))*transl(0, 0, 0.05);
 %     updatedPoints = ///
+%     mesh.vertices = ///
 end
 
 %Return to Home
 
 for i = 1:steps
-    qMatrix(i,:) = (1-s(i))*qContainerOne + s(i)*qHomePose;
+    qMatrix(i,:) = (1-s(i))*qContainerThree + s(i)*qHomePose;
     robot.model.animate(qMatrix(i,:));
 end
 
