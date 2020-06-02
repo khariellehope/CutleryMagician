@@ -36,12 +36,17 @@ hold on;
 
 %Import containers
 %Locations of each container (hard coded):
-containerOneLoc = transl(0.7, 1, 0.2);
+% containerOneLoc = transl(0.7, 1, 0.2);
 containerTwoLoc = transl(0.9, 1, 0.2);
 containerThreeLoc = transl(1.1, 1, 0.2);
 
-partMesh = Environment('Container1.ply', containerOneLoc(1,4), containerOneLoc(2,4), containerOneLoc(3,4));
+containerOneLoc = transl(1.41, 1, 0.25);
+
+[partMesh, f, v, faceNormals] = Environment('Container1.ply', containerOneLoc(1,4), containerOneLoc(2,4), containerOneLoc(3,4));
 containerOneMesh_h = partMesh;
+containerOneFaces = f;
+containerOneVertices = v;
+containerOneFaceNorm = faceNormals;
 hold on;
 
 partMesh = Environment('Container2.ply', containerTwoLoc(1,4), containerTwoLoc(2,4), containerTwoLoc(3,4));
@@ -78,32 +83,37 @@ spoonLoc = transl(1.2, 1, 0.25);
 forkLoc = transl(1.3, 1, 0.25);
 knifeLoc = transl(1.4, 1, 0.25);
 
-partMesh = Environment('Spoon.ply', spoonLoc(1,4), spoonLoc(2,4), spoonLoc(3,4));
+[partMesh, partVertexCount, partVerts] = PlotCutlery('Spoon.ply', spoonLoc(1,4), spoonLoc(2,4), spoonLoc(3,4));
 spoonMesh_h = partMesh; 
 
-partMesh = Environment('Fork.ply', forkLoc(1,4), forkLoc(2,4), forkLoc(3,4));
+[partMesh, partVertexCount, partVerts] = PlotCutlery('Fork.ply', forkLoc(1,4), forkLoc(2,4), forkLoc(3,4));
 forkMesh_h = partMesh;
 
-partMesh = Environment('Knife.ply', knifeLoc(1,4), knifeLoc(2,4), knifeLoc(3,4));
+[partMesh, partVertexCount, partVerts] = PlotCutlery('Knife.ply', knifeLoc(1,4), knifeLoc(2,4), knifeLoc(3,4));
 knifeMesh_h = partMesh;
 
 
 
 %% Collision avoidance?
-%Check for collision with barrier or container(s)??
-
-% Create collision points i.e. 
-
 %if collision == 1, then stop robot, if =0; continue movement
 % collision checking should be done within movement section???? qMatrix
 % depends on the movement of robot
-
-collisionStatus = CheckForCollision(robot, qMatrix, vertex, faces, faceNormals);
+qMatrix = deg2rad([0,0,0,0,0,0]);           %Test code, can't work out how to find Face Normals
+% centerpnt = [2,0,-0.5];
+% side = 1.5;
+% plotOptions.plotFaces = true;
+%  [Vertex,Faces,FaceNormals] = RectangularPrism(centerpnt-side/2, centerpnt+side/2,plotOptions);
+ 
+collisionStatus = CheckForCollision(robot, qMatrix, containerOneVertices, containerOneFaces, containerOneFaceNorm)
 if collisionStatus == 1
   display('Collision Detected!!! Robot has paused');
   while collisionStatus == 1
   pause(1);
   end
+  
+else
+    display('No collisions: Cutlery Magician safely moving~');
+    return
 end
 
 %% Check workspace area
@@ -208,13 +218,17 @@ for i = 1:steps
     robot.model.animate(qMatrix(i,:));
 end
 
-%% GUI Functions
-function UpdateJointAngle(robot, joint,angle)
-    qGUI(1,joint) = deg2rad(angle);
-    
+ %% GUI Functions
+% function UpdateJointAngle(robot, joint,angle)
+%     qGUI(1,joint) = deg2rad(angle);
+%     
+% 
+%     robot.model.animate(qGUI);
+% 
+% end
 
-    robot.model.animate(qGUI);
-
-end
-
-
+%% test
+   [Y,Z] = meshgrid(-0.3:0.01:0.3,0:0.01:0.46);
+                    sizeMat = size(Y);
+                    X = repmat(-0.11,sizeMat(1),sizeMat(2));
+                    cubePoints = [X(:),Y(:),Z(:)];
