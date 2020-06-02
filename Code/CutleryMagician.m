@@ -34,13 +34,14 @@ partMesh = Environment('kitchen.ply', xOffset, yOffset, zOffset);
 benchMesh_h = partMesh;
 hold on;
 
+%%
 %Import containers
 %Locations of each container (hard coded):
-% containerOneLoc = transl(0.7, 1, 0.2);
-containerTwoLoc = transl(0.9, 1, 0.2);
+containerOneLoc = transl(0.9, 1, 0.2);
+containerTwoLoc = transl(1, 1, 0.2);
 containerThreeLoc = transl(1.1, 1, 0.2);
 
-containerOneLoc = transl(1.41, 1, 0.25);
+%ContainerOneLoc = transl(1.41, 1, 0.25);
 
 [partMesh, f, v, faceNormals] = Environment('Container1.ply', containerOneLoc(1,4), containerOneLoc(2,4), containerOneLoc(3,4));
 containerOneMesh_h = partMesh;
@@ -83,14 +84,14 @@ spoonLoc = transl(1.2, 1, 0.25);
 forkLoc = transl(1.3, 1, 0.25);
 knifeLoc = transl(1.4, 1, 0.25);
 
-[partMesh, partVertexCount, partVerts] = PlotCutlery('Spoon.ply', spoonLoc(1,4), spoonLoc(2,4), spoonLoc(3,4));
-spoonMesh_h = partMesh; 
+[spoonMesh, spoonVertexCount, spoonVerts] = PlotCutlery('Spoon.ply', spoonLoc(1,4), spoonLoc(2,4), spoonLoc(3,4));
+spoonMesh_h = spoonMesh; 
 
-[partMesh, partVertexCount, partVerts] = PlotCutlery('Fork.ply', forkLoc(1,4), forkLoc(2,4), forkLoc(3,4));
-forkMesh_h = partMesh;
+[forkMesh, forkVertexCount, forkVerts] = PlotCutlery('Fork.ply', forkLoc(1,4), forkLoc(2,4), forkLoc(3,4));
+forkMesh_h = forkMesh;
 
-[partMesh, partVertexCount, partVerts] = PlotCutlery('Knife.ply', knifeLoc(1,4), knifeLoc(2,4), knifeLoc(3,4));
-knifeMesh_h = partMesh;
+[knifeMesh, knifeVertexCount, knifeVerts] = PlotCutlery('Knife.ply', knifeLoc(1,4), knifeLoc(2,4), knifeLoc(3,4));
+knifeMesh_h = knifeMesh;
 
 
 
@@ -120,56 +121,56 @@ end
 %Want to see workspace area to see if all the items are within the arms
 %reach 
 
-stepRads = deg2rad(3);
-qlim = robot.model.qlim;
-
-pointCloudeSize = prod(floor((qlim(1:5,2)-qlim(1:5,1))/stepRads +1))
-pointCloud = zeros(pointCloudeSize,3);
-counter = 1;
-
-message = msgbox('Calculating Jaco workspace area');
-
-for q1 = qlim(1,1):stepRads:qlim(1,2)
-    for q2 = qlim(2,1):stepRads:qlim(2,2)
-        for q3 = qlim(3,1):stepRads:qlim(3,2)
-            for q4 = qlim(4,1):stepRads:qlim(4,2)
-                for q5 = qlim(5,1):stepRads:qlim(5,2)
-                    for q6 = 0
-                    q = [q1,q2,q3,q4,q5,q6];
-                    tr = robot.model.fkine(q);
-                    pointCloud(counter,:) = tr(1:3,4)';
-                    counter = counter + 1;
-                    end
-                end
-            end
-        end
-    end
-end
-
-[maxReach, workspaceVol] = convhull(pointCloud);
-
-hold on 
-
-maxReach = plot3(pointCloud(maxReach,1),pointCloud(maxReach,2),pointCloud(maxReach,3),'r.');
-
-
-msg = msgbox('Calculations complete, code paused');
-
-pause();
-delete(maxReach);
-%% Sensor data?
-
-%% Estop Check
-%This should be put within the movement function later. ie Check for estop
-%and collisions before robot arm moves
-
-if eStopPressed ~= 0
-    display('EMERGENCY STOP');
-    while eStopPressed ~= 0
-        pause(1);
-    end
-    
-end
+% stepRads = deg2rad(3);
+% qlim = robot.model.qlim;
+% 
+% pointCloudeSize = prod(floor((qlim(1:5,2)-qlim(1:5,1))/stepRads +1))
+% pointCloud = zeros(pointCloudeSize,3);
+% counter = 1;
+% 
+% message = msgbox('Calculating Jaco workspace area');
+% 
+% for q1 = qlim(1,1):stepRads:qlim(1,2)
+%     for q2 = qlim(2,1):stepRads:qlim(2,2)
+%         for q3 = qlim(3,1):stepRads:qlim(3,2)
+%             for q4 = qlim(4,1):stepRads:qlim(4,2)
+%                 for q5 = qlim(5,1):stepRads:qlim(5,2)
+%                     for q6 = 0
+%                     q = [q1,q2,q3,q4,q5,q6];
+%                     tr = robot.model.fkine(q);
+%                     pointCloud(counter,:) = tr(1:3,4)';
+%                     counter = counter + 1;
+%                     end
+%                 end
+%             end
+%         end
+%     end
+% end
+% 
+% [maxReach, workspaceVol] = convhull(pointCloud);
+% 
+% hold on 
+% 
+% maxReach = plot3(pointCloud(maxReach,1),pointCloud(maxReach,2),pointCloud(maxReach,3),'r.');
+% 
+% 
+% msg = msgbox('Calculations complete, code paused');
+% 
+% pause();
+% delete(maxReach);
+% %% Sensor data?
+% 
+% %% Estop Check
+% %This should be put within the movement function later. ie Check for estop
+% %and collisions before robot arm moves
+% 
+% if eStopPressed ~= 0
+%     display('EMERGENCY STOP');
+%     while eStopPressed ~= 0
+%         pause(1);
+%     end
+%     
+% end
 
 
 %% Movement
@@ -205,10 +206,10 @@ for i = 1:steps
     qMatrix(i,:) = (1-s(i))*qSpoon + s(i)*qContainerThree;
     robot.model.animate(qMatrix(i,:));
     
-%     Spoon model being brought to container    
-%     spoonEE = robot.model.fkine(qMatrix(i,:))*transl(0, 0, 0.05);
-%     updatedPoints = ///
-%     mesh.vertices = ///
+    %Spoon model being brought to container    
+    spoonEE = robot.model.fkine(qMatrix(i,:))*transl(0, 0, 0.05);
+    spoonUpdatedPoints = [spoonEE*[spoonVerts,ones(spoonVertexCount,1)]']';
+    spoonMesh_h.Vertices = spoonUpdatedPoints(:,1:3);
 end
 
 %Return to Home
