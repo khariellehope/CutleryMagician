@@ -14,7 +14,7 @@ function [partMesh, f, v, faceNormals] = Environment(object, xOffset, yOffset, z
         v1 = v(f(faceIndex,1)',:);
         v2 = v(f(faceIndex,2)',:);
         v3 = v(f(faceIndex,3)',:);
-        faceNormals(faceIndex,:) = unit(cross(v2-v1,v3-v1));
+        faceNormals(faceIndex,:) = cross(v2-v1,v3-v1);
     end
   
   

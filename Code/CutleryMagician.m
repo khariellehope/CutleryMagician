@@ -34,6 +34,19 @@ partMesh = Environment('kitchen.ply', xOffset, yOffset, zOffset);
 benchMesh_h = partMesh;
 hold on;
 
+%Floor
+x = [2 -2.5; 2 -2.5];
+y = [2 2; -2.5 -2.5];
+z = [-0.5 -0.5; -0.5 -0.5];
+floor_h = background('floor.jpeg', x, y, z);
+
+%Window Wall
+x = [1.1 -2.5; 1.1 -2.5];
+y = [2 2; 2 2];
+z = [1 1; -0.6 -0.6]; 
+window_h = background('windowWall.jpg', x, y, z);
+
+
 %%
 %Import containers
 %Locations of each container (hard coded):
@@ -59,24 +72,28 @@ containerThreeMesh_h = partMesh;
 hold on;
 
 %Safety Features - i.e eStop, encasing, 
-eStopLoc = transl(0.6, 1, 0.2);             %Location needs to be fixed up, this is a random number
+eStopLoc = transl(0.7, 0.8, 0.2);             %Location needs to be fixed up, this is a random number
+barrierLoc = transl(0.6, 1, 0.2);
 
-%partMesh = Environment('eStop.ply', eStopLoc(1,4), eStopLoc(2,4),
-%eStopLoc(3,4));
-%eStopMesh_h = partMesh;
-%hold on;
+%eStop
+partMesh = Environment('eStop.ply', eStopLoc(1,4), eStopLoc(2,4), eStopLoc(3,4)); %Rescale Estop lol
+eStopMesh_h = partMesh;
+hold on;
 
-%Floor
-x = [2 -2.5; 2 -2.5];
-y = [2 2; -2.5 -2.5];
-z = [-0.5 -0.5; -0.5 -0.5];
-floor_h = background('floor.jpeg', x, y, z);
+%Barrier
 
-%Window Wall
-x = [1.1 -2.5; 1.1 -2.5];
-y = [2 2; 2 2];
-z = [1 1; -0.6 -0.6]; 
-window_h = background('windowWall.jpg', x, y, z);
+partMesh = Environment('SafetyBarrier.ply', barrierLoc(1,4), barrierLoc(2,4), barrierLoc(3,4));
+barrierMesh_h = partMesh;
+hold on;
+
+%Lights
+% xOffset = ;
+% yOffset = ;
+% zOffset = ;
+% partMesh = Environment('Lights.ply', xOffset, yOffset, zOffset);
+% estopMesh_h = partMesh;
+% hold on;
+
 
 %% Import Cutlery
 

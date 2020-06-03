@@ -34,14 +34,27 @@ partMesh = Environment('kitchen.ply', xOffset, yOffset, zOffset);
 benchMesh_h = partMesh;
 hold on;
 
+%Floor
+x = [2 -2.5; 2 -2.5];
+y = [2 2; -2.5 -2.5];
+z = [-0.5 -0.5; -0.5 -0.5];
+floor_h = background('floor.jpeg', x, y, z);
+
+%Window Wall
+x = [1.1 -2.5; 1.1 -2.5];
+y = [2 2; 2 2];
+z = [1 1; -0.6 -0.6]; 
+window_h = background('windowWall.jpg', x, y, z);
+
+
 %%
 %Import containers
 %Locations of each container (hard coded):
-containerOneLoc = transl(0.7, 1, 0.2);
+containerOneLoc = transl(0.9, 1, 0.2);
 containerTwoLoc = transl(1, 1, 0.2);
 containerThreeLoc = transl(1.1, 1, 0.2);
 
-containerOneLoc = transl(1.41, 1, 0.25);
+%ContainerOneLoc = transl(1.41, 1, 0.25);
 
 [partMesh, f, v, faceNormals] = Environment('Container1.ply', containerOneLoc(1,4), containerOneLoc(2,4), containerOneLoc(3,4));
 containerOneMesh_h = partMesh;
@@ -66,17 +79,31 @@ eStopLoc = transl(0.6, 1, 0.2);             %Location needs to be fixed up, this
 %eStopMesh_h = partMesh;
 %hold on;
 
-%Floor
-x = [2 -2.5; 2 -2.5];
-y = [2 2; -2.5 -2.5];
-z = [-0.5 -0.5; -0.5 -0.5];
-floor_h = background('floor.jpeg', x, y, z);
+%Barrier
+xOffset = 0.6;
+yOffset = 1;
+zOffset = 0.2;
+partMesh = Environment('SafetyBarrier.ply', xOffset, yOffset, zOffset);
+barrierMesh_h = partMesh;
+hold on;
 
-%Window Wall
-x = [1.1 -2.5; 1.1 -2.5];
-y = [2 2; 2 2];
-z = [1 1; -0.6 -0.6]; 
-window_h = background('windowWall.jpg', x, y, z);
+% %Emergency Stop
+% 
+% xOffset = ;
+% yOffset = ;
+% zOffset = ;
+% partMesh = Environment('estop.ply', xOffset, yOffset, zOffset);
+% estopMesh_h = partMesh;
+% hold on;
+
+%Lights
+% xOffset = ;
+% yOffset = ;
+% zOffset = ;
+% partMesh = Environment('Lights.ply', xOffset, yOffset, zOffset);
+% estopMesh_h = partMesh;
+% hold on;
+
 
 %% Import Cutlery
 
