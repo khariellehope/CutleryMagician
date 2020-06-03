@@ -177,17 +177,17 @@ end
 % delete(maxReach);
 % %% Sensor data?
 % 
-% %% Estop Check
-% %This should be put within the movement function later. ie Check for estop
-% %and collisions before robot arm moves
-% 
-% if eStopPressed ~= 0
-%     display('EMERGENCY STOP');
-%     while eStopPressed ~= 0
-%         pause(1);
-%     end
-%     
-% end
+%% Estop Check
+%This should be put within the movement function later. ie Check for estop
+%and collisions before robot arm moves
+
+if eStopButton ~= 0
+    display('EMERGENCY STOP');
+    while eStopPressed ~= 0
+        pause(1);
+    end
+    
+end
 
 
 %% Movement
@@ -245,8 +245,23 @@ end
 % 
 % end
 
-%% test
-   [Y,Z] = meshgrid(-0.3:0.01:0.3,0:0.01:0.46);
-                    sizeMat = size(Y);
-                    X = repmat(-0.11,sizeMat(1),sizeMat(2));
-                    cubePoints = [X(:),Y(:),Z(:)];
+%% test (test code for gui sections)
+ 
+%    [Y,Z] = meshgrid(-0.3:0.01:0.3,0:0.01:0.46);
+%                     sizeMat = size(Y);
+%                     X = repmat(-0.11,sizeMat(1),sizeMat(2));
+%                     cubePoints = [X(:),Y(:),Z(:)];
+
+% function UpdateCartesian(variable)
+%     switch
+%         case x
+%         case y
+%         case z
+%     end
+%     %for x:
+%     EEloc = robot.model.fkine();
+%     EEloc(1,4) = variable;
+%     qNew = robot.model.ikcon(EEloc);  
+%     robot.model.animate(qNew);
+%     
+% end
