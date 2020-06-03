@@ -18,10 +18,6 @@ robot.model.plotopt = {'nojoints', 'noname', 'noshadow','nowrist'};
 robot.model.plot(qHomePose, 'scale', scale, 'workspace', robot.workspace);      %Plot model         
 hold on;
 
-% use switch case for determining movement of robot/end effector to box
-% depending on which cutlery was picked up
-
-
 %% Import Environment
 
 %Kitchen Bench
@@ -236,14 +232,6 @@ for i = 1:steps
     robot.model.animate(qMatrix(i,:));
 end
 
- %% GUI Functions
-% function UpdateJointAngle(robot, joint,angle)
-%     qGUI(1,joint) = deg2rad(angle);
-%     
-% 
-%     robot.model.animate(qGUI);
-% 
-% end
 
 %% test (test code for gui sections)
  
@@ -252,16 +240,3 @@ end
 %                     X = repmat(-0.11,sizeMat(1),sizeMat(2));
 %                     cubePoints = [X(:),Y(:),Z(:)];
 
-% function UpdateCartesian(variable)
-%     switch
-%         case x
-%         case y
-%         case z
-%     end
-%     %for x:
-%     EEloc = robot.model.fkine();
-%     EEloc(1,4) = variable;
-%     qNew = robot.model.ikcon(EEloc);  
-%     robot.model.animate(qNew);
-%     
-% end
