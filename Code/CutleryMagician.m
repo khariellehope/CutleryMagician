@@ -8,14 +8,14 @@ set(0,'DefaultFigureWindowStyle','docked');
 scale = 0.1;
 jacoBase = transl(1.5, 1,0.25)*trotz(pi);
 qHomePose = [0 pi/2 pi/2 0 pi 0];                  %Change joint angles accordingly
-
+qTest = deg2rad([-0.1466,5.4629,3.6849,0,3.1416,0]); 
 %Get robot arm 
 robot = Jaco;                            %Calling the Jaco class
 robot.GetJacoRobot();                     %Calling the 'GetJacoRobot' function from class - This function creates the model using dh parameters
 robot.PlotAndColourRobot();               %Use ply files to model realistic Jaco Robot
 robot.model.base = jacoBase;              %Set base position
 robot.model.plotopt = {'nojoints', 'noname', 'noshadow','nowrist'};
-robot.model.plot(qHomePose, 'scale', scale, 'workspace', robot.workspace);      %Plot model         
+robot.model.plot(qTest, 'scale', scale, 'workspace', robot.workspace);      %Plot model         
 hold on;
 
 %% Import Environment
@@ -26,8 +26,11 @@ hold on;
 xOffset = 0;
 yOffset = 0;
 zOffset = -0.5;
-partMesh = Environment('kitchen.ply', xOffset, yOffset, zOffset);
+[partMesh,f,v] = Environment('kitchen.ply', xOffset, yOffset, zOffset);
 benchMesh_h = partMesh;
+benchFaces = f;
+benchVertices = v;
+% benchFN = benchMesh_h.FaceNormals;
 hold on;
 
 %Floor
@@ -52,19 +55,25 @@ containerThreeLoc = transl(1.1, 1, 0.2);
 
 %ContainerOneLoc = transl(1.41, 1, 0.25);
 
-[partMesh, f, v, faceNormals] = Environment('Container1.ply', containerOneLoc(1,4), containerOneLoc(2,4), containerOneLoc(3,4));
+[partMesh, f, v] = Environment('Container1.ply', containerOneLoc(1,4), containerOneLoc(2,4), containerOneLoc(3,4));
 containerOneMesh_h = partMesh;
 containerOneFaces = f;
 containerOneVertices = v;
-containerOneFaceNorm = faceNormals;
+% containerOneFN = containerOneMesh_h.FaceNormals;
 hold on;
 
-partMesh = Environment('Container2.ply', containerTwoLoc(1,4), containerTwoLoc(2,4), containerTwoLoc(3,4));
+[partMesh, f, v] = Environment('Container2.ply', containerTwoLoc(1,4), containerTwoLoc(2,4), containerTwoLoc(3,4));
 containerTwoMesh_h = partMesh;
+containerTwoFaces = f;
+containerTwoVertices = v;
+% containerTwoFaceNorms = containerTwoMesh_h.FaceNormals;
 hold on;
 
 partMesh = Environment('Container3.ply', containerThreeLoc(1,4), containerThreeLoc(2,4), containerThreeLoc(3,4));
 containerThreeMesh_h = partMesh;
+containerThreeFaces = f;
+containerThreeVertices = v;
+% containerThreeFaceNorms = containerThreeMesh_h.FaceNormals;
 hold on;
 
 %Safety Features - i.e eStop, encasing, 
@@ -112,13 +121,13 @@ knifeMesh_h = knifeMesh;
 %if collision == 1, then stop robot, if =0; continue movement
 % collision checking should be done within movement section???? qMatrix
 % depends on the movement of robot
-qMatrix = deg2rad([0,0,0,0,0,0]);           %Test code, can't work out how to find Face Normals
-% centerpnt = [2,0,-0.5];
-% side = 1.5;
+qMatrix = deg2rad([-0.1745,5.4629,0.3316,-0.1745,2.4592,-0.1175]);           
+% centerpnt = [1.1,1,0.25];
+% side = 0.15;
 % plotOptions.plotFaces = true;
-%  [Vertex,Faces,FaceNormals] = RectangularPrism(centerpnt-side/2, centerpnt+side/2,plotOptions);
+% [Vertex,Faces,FaceNormals] = RectangularPrism(centerpnt-side/2, centerpnt+side/2,plotOptions);
  
-collisionStatus = CheckForCollision(robot, qMatrix, containerOneVertices, containerOneFaces, containerOneFaceNorm)
+collisionStatus = CheckForCollision(robot, qMatrix, benchMesh_h.Vertices, benchMesh_h.Faces, benchMesh_h.FaceNormals)
 if collisionStatus == 1
   display('Collision Detected!!! Robot has paused');
   while collisionStatus == 1
