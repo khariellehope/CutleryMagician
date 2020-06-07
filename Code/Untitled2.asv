@@ -64,7 +64,6 @@ for i = 1:steps
       display('Collision Detected!!! Robot has paused');
       while lightCurtainStatus == 1
       pause(0.1);
-      return
       end
 
     else
