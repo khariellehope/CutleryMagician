@@ -17,11 +17,14 @@ robot.model.base = jacoBase;              %Set base position
 robot.model.plotopt = {'nojoints', 'noname', 'noshadow','nowrist'};
 robot.model.plot(qTest, 'scale', robot.scale, 'workspace', robot.workspace);      %Plot model         
 hold on;
-
+%%
 % Import Environment
 
+%hand
+handLoc = transl(1, 0.3, 0.2);
+partMesh = Environment('hand2.ply', handLoc(1,4), handLoc(2,4), handLoc(3,4));
 %Kitchen Bench
-
+%%
 %Using environment function:
 xOffset = 0;
 yOffset = 0;
@@ -46,6 +49,10 @@ x = [2 -2.; 2 -2];
 y = [1.4 1.4; 1.4 1.4];
 z = [1 1; -0.6 -0.6]; 
 window_h = background('windowWall.jpg', x, y, z);
+ 
+for z = 0.2:0.05:0.5
+    line('XData', [0.6 1.8], 'YData', [0.7 0.7], 'Zdata', [z z], 'Color', [0 1 0]);
+end
 
 %%
 %
