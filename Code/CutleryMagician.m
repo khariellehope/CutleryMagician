@@ -5,7 +5,7 @@ clear all
 set(0,'DefaultFigureWindowStyle','docked');
 
 % Model Jaco arm
-scale = 0.1;
+
 jacoBase = transl(1.5, 1,0.25)*trotz(pi);
 qHomePose = [0 pi/2 pi/2 0 pi 0];                  %Change joint angles accordingly
 qTest = deg2rad([-0.1466,5.4629,3.6849,0,3.1416,0]); 
@@ -15,10 +15,10 @@ robot.GetJacoRobot();                     %Calling the 'GetJacoRobot' function f
 robot.PlotAndColourRobot();               %Use ply files to model realistic Jaco Robot
 robot.model.base = jacoBase;              %Set base position
 robot.model.plotopt = {'nojoints', 'noname', 'noshadow','nowrist'};
-robot.model.plot(qTest, 'scale', scale, 'workspace', robot.workspace);      %Plot model         
+robot.model.plot(qTest, 'scale', robot.scale, 'workspace', robot.workspace);      %Plot model         
 hold on;
 
-%% Import Environment
+% Import Environment
 
 %Kitchen Bench
 
@@ -46,7 +46,7 @@ z = [1 1; -0.6 -0.6];
 window_h = background('windowWall.jpg', x, y, z);
 
 
-%%
+%
 %Import containers
 %Locations of each container (hard coded):
 containerOneLoc = transl(0.9, 1, 0.2);
@@ -75,16 +75,16 @@ containerThreeFaces = f;
 containerThreeVertices = v;
 % containerThreeFaceNorms = containerThreeMesh_h.FaceNormals;
 hold on;
-
+%%
 %Safety Features - i.e eStop, encasing, 
-eStopLoc = transl(0.7, 0.8, 0.2);             %Location needs to be fixed up, this is a random number
+eStopLoc = transl(1.7, 0.8, 0.2)*trotz(pi/2);             %Location needs to be fixed up, this is a random number5
 barrierLoc = transl(0.6, 1, 0.2);
 
 %eStop
 partMesh = Environment('eStop.ply', eStopLoc(1,4), eStopLoc(2,4), eStopLoc(3,4)); %Rescale Estop lol
 eStopMesh_h = partMesh;
 hold on;
-
+%%
 %Barrier
 
 partMesh = Environment('SafetyBarrier.ply', barrierLoc(1,4), barrierLoc(2,4), barrierLoc(3,4));
@@ -100,7 +100,7 @@ hold on;
 % hold on;
 
 
-%% Import Cutlery
+% Import Cutlery
 
 spoonLoc = transl(1.2, 1, 0.25);
 forkLoc = transl(1.3, 1, 0.25);
@@ -139,10 +139,10 @@ else
     return
 end
 
-%% Check workspace area
-%Want to see workspace area to see if all the items are within the arms
-%reach 
-
+% Check workspace area
+% Want to see workspace area to see if all the items are within the arms
+% reach 
+% 
 % stepRads = deg2rad(3);
 % qlim = robot.model.qlim;
 % 
@@ -180,20 +180,19 @@ end
 % 
 % pause();
 % delete(maxReach);
-% %% Sensor data?
-% 
+%% Sensor data?
+
 %% Estop Check
 %This should be put within the movement function later. ie Check for estop
 %and collisions before robot arm moves
-
-if eStopButton ~= 0
-    display('EMERGENCY STOP');
-    while eStopPressed ~= 0
-        pause(1);
-    end
-    
-end
-
+% 
+% if eStopButton ~= 0
+%     display('EMERGENCY STOP');
+%     while eStopPressed ~= 0
+%         pause(1);
+%     end
+%     
+% end
 
 %% Movement
 %Testing movement of arm from cutlery to containers. Will be changed to
@@ -211,12 +210,16 @@ qMatrix = nan(steps, 6); %Memory allocation
 % end
 
 %Pick up Spoon - HomePose to SpoonLoc, Spoon Loc to containerOne
-
+%
 qSpoon = robot.model.ikcon(spoonLoc);
 qContainerOne = robot.model.ikcon(containerOneLoc);
 qContainerTwo = robot.model.ikcon(containerTwoLoc);
 qContainerThree = robot.model.ikcon(containerThreeLoc);
-
+    
+jacoMove(qHomePose, qSpoon, robot);
+objectMove(qSpoon, qContainerThree, robot, spoonVerts, spoonVertexCount, spoonMesh_h);
+jacoMove(qContainerThree, qHomePose, robot);
+%
 
 for i = 1:steps
     qMatrix(i,:) = (1-s(i))*qHomePose + s(i)*qSpoon;
@@ -242,10 +245,22 @@ for i = 1:steps
 end
 
 
-%% test (test code for gui sections)
- 
-%    [Y,Z] = meshgrid(-0.3:0.01:0.3,0:0.01:0.46);
-%                     sizeMat = size(Y);
-%                     X = repmat(-0.11,sizeMat(1),sizeMat(2));
-%                     cubePoints = [X(:),Y(:),Z(:)];
-
+%%
+qForcedCollision = transl(0.7, 1, 0.2);
+            
+            objectMove(qHomePose, qForcedCollision, robot, spoonVerts, spoonVertexCount, spoonMesh_h);
+            collisionStatus = CheckForCollision(robot, qMatrix, barrierMesh_h.Vertices, barrierMesh_h.Faces, barrierMesh_h.FaceNormals)
+                if collisionStatus == 1
+                  
+                  while collisionStatus == 1
+                     
+                     pause();
+                  
+                  
+                  end
+                  
+                else
+                    
+                    jacoMove(qForcedCollision, app.qHomePose, app.robot);
+                    return
+                end

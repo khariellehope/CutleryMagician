@@ -2,6 +2,7 @@ classdef Jaco < handle
     properties
         model;
         workspace = [-2 2 -2 2 -0.5 1];
+        scale = 0.1;
         toolModelFileName = []; %For importing model of robot if files available 
     end
     
