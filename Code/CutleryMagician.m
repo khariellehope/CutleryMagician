@@ -17,11 +17,11 @@ robot.model.base = jacoBase;              %Set base position
 robot.model.plotopt = {'nojoints', 'noname', 'noshadow','nowrist'};
 robot.model.plot(qTest, 'scale', robot.scale, 'workspace', robot.workspace);      %Plot model         
 hold on;
-%%
-% Import Environment
+
+%% Import Environment
 
 %hand
-handLoc = transl(1, 0.3, 0.2);
+handLoc = transl(1, 0.3, 0.4);
 partMesh = Environment('hand2.ply', handLoc(1,4), handLoc(2,4), handLoc(3,4));
 %Kitchen Bench
 %%
