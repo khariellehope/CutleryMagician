@@ -33,19 +33,21 @@ benchVertices = v;
 % benchFN = benchMesh_h.FaceNormals;
 hold on;
 
+
 %Floor
 x = [2 -2.5; 2 -2.5];
 y = [2 2; -2.5 -2.5];
 z = [-0.5 -0.5; -0.5 -0.5];
 floor_h = background('floor.jpeg', x, y, z);
-
+%%
+delete window_h
 %Window Wall
-x = [1.1 -2.5; 1.1 -2.5];
-y = [2 2; 2 2];
+x = [2 -2.; 2 -2];
+y = [1.4 1.4; 1.4 1.4];
 z = [1 1; -0.6 -0.6]; 
 window_h = background('windowWall.jpg', x, y, z);
 
-
+%%
 %
 %Import containers
 %Locations of each container (hard coded):
@@ -88,6 +90,10 @@ hold on;
 %Barrier
 
 partMesh = Environment('SafetyBarrier.ply', barrierLoc(1,4), barrierLoc(2,4), barrierLoc(3,4));
+barrierMesh_h = partMesh;
+hold on;
+
+partMesh = Environment('SafetyBarrier2.ply', hope(1,4), hope(2,4), hope(3,4));
 barrierMesh_h = partMesh;
 hold on;
 
