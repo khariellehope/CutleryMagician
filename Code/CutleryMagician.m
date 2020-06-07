@@ -7,7 +7,7 @@ set(0,'DefaultFigureWindowStyle','docked');
 % Model Jaco arm
 
 jacoBase = transl(1.5, 1,0.25)*trotz(pi);
-qHomePose = [0 pi/2 pi/2 0 pi 0];                  %Change joint angles accordingly
+qHomePose = [0 0 0 0 0 0];                  %Change joint angles accordingly
 qTest = deg2rad([-0.1466,5.4629,3.6849,0,3.1416,0]); 
 %Get robot arm 
 robot = Jaco;                            %Calling the Jaco class
@@ -42,8 +42,7 @@ x = [2 -2.5; 2 -2.5];
 y = [2 2; -2.5 -2.5];
 z = [-0.5 -0.5; -0.5 -0.5];
 floor_h = background('floor.jpeg', x, y, z);
-%%
-delete window_h
+
 %Window Wall
 x = [2 -2.; 2 -2];
 y = [1.4 1.4; 1.4 1.4];
@@ -86,8 +85,12 @@ containerThreeVertices = v;
 hold on;
 %%
 %Safety Features - i.e eStop, encasing, 
-eStopLoc = transl(1.7, 0.8, 0.2)*trotz(pi/2);             %Location needs to be fixed up, this is a random number5
-barrierLoc = transl(0.6, 1, 0.2);
+eStopLoc = transl(0.6, -0.7,0.2);            %Location needs to be fixed up, this is a random number5
+barrier1Loc = transl(0.6, 1, 0.2);
+barrier2Loc = transl(1.8, 1, 0.2);
+barrier3Loc = transl(0.9, 1.4, 0.2);
+barrier4Loc = transl(1.4, 1.4, 0.2);
+
 
 %eStop
 partMesh = Environment('eStop.ply', eStopLoc(1,4), eStopLoc(2,4), eStopLoc(3,4)); %Rescale Estop lol
@@ -100,17 +103,25 @@ partMesh = Environment('SafetyBarrier.ply', barrierLoc(1,4), barrierLoc(2,4), ba
 barrierMesh_h = partMesh;
 hold on;
 
-partMesh = Environment('SafetyBarrier2.ply', hope(1,4), hope(2,4), hope(3,4));
-barrierMesh_h = partMesh;
+partMesh = Environment('SafetyBarrier.ply', barrier2Loc(1,4), barrier2Loc(2,4), barrier2Loc(3,4));
+barrier2Mesh_h = partMesh;
 hold on;
 
-%Lights
-% xOffset = ;
-% yOffset = ;
-% zOffset = ;
-% partMesh = Environment('Lights.ply', xOffset, yOffset, zOffset);
-% estopMesh_h = partMesh;
-% hold on;
+%Barriers against wall
+
+partMesh = Environment('SafetyBarrier2.ply', barrier3Loc(1,4), barrier3Loc(2,4), barrier3Loc(3,4));
+barrier3Mesh_h = partMesh;
+hold on;
+
+partMesh = Environment('SafetyBarrier2.ply', barrier4Loc(1,4), barrier4Loc(2,4), barrier4Loc(3,4));
+barrier4Mesh_h = partMesh;
+hold on;
+
+%Light Curtain
+
+for z = 0.2:0.05:0.6
+    line('XData', [0.6 1.8], 'YData', [0.7 0.7], 'Zdata', [z z], 'Color', [1 0 0]);
+end
 
 
 % Import Cutlery
@@ -128,7 +139,52 @@ forkMesh_h = forkMesh;
 [knifeMesh, knifeVertexCount, knifeVerts] = PlotCutlery('Knife.ply', knifeLoc(1,4), knifeLoc(2,4), knifeLoc(3,4));
 knifeMesh_h = knifeMesh;
 
+%% Visual Servoing and RMRC
+%Please note that some of these sections were taken from Lab8Solution
 
+pWarning = ; %Image target points in image lane
+targetPoints = [x x x x; y y y y; z z z z];
+qInitial = [];
+cam = CentralCamera('focal', 0.08', 'pixel', 10e-5, ...
+    'resolution', [1024 1024], 'centre', [500 500], 'name', 'CM Cam');
+fps = 25;
+lambda = 0.6 %Gain
+depth = mean (pWarning(1,:));
+
+jcTr = robot.model.fkine(qInitial);
+robot.model.animate(qInitial');
+drawnow
+
+cam.T = jcTr; %Plots cam 
+cam.plot_camera('Tcam', jcTr, 'label', 'scale', 0.15);%Display points in cam
+plot_sphere(pWarning, 0.01, 'r');%Display points in 3d
+
+
+p = cam.plot(pWarning, 'Tcam', jcTr);
+
+cam.clf();
+cam.plot(targetPoints), '*');
+cam.hold(true);
+cam.plot(pWarning, 'Tcam', jcTr, 'o');
+pause(2);
+cam.hold(true);
+cam.plot(pWarning); %Plot initial View
+
+vel_p = [];
+uv_p = [];
+history = [];
+
+%Visual Servo Loop 
+
+ksteps = 0;
+while true
+    ksteps=ksteps +1;
+    uv = cam.plot(pWarning)
+    e = targetPoints - uv;
+    e = e(:);
+    Zest = [];
+    
+    if isempty(depth)
 
 %% Collision avoidance?
 %if collision == 1, then stop robot, if =0; continue movement
