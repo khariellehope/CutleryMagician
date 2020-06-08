@@ -6,8 +6,8 @@ set(0,'DefaultFigureWindowStyle','docked');
 
 % Model Jaco arm
 
-jacoBase = transl(2.1, 1.5, 0.7)*trotz(pi);
-qHomePose = [0 pi deg2rad(341) pi/2 2*pi 0];                  %Change joint angles accordingly
+jacoBase = transl(2.3, 1.85, 0.7);
+qHomePose = [pi/2 pi deg2rad(341) pi/2 2*pi 0];                  %Change joint angles accordingly
 qTest = deg2rad([-0.1466,5.4629,3.6849,0,3.1416,0]); 
 %Get robot arm 
 robot = Jaco;                            %Calling the Jaco class
@@ -51,9 +51,9 @@ window_h = background('windowWall.jpg', x, y, z);
 %
 %Import containers
 %Locations of each container (hard coded):
-containerOneLoc = transl(1.4, 1.5, 0.6);
-containerTwoLoc = transl(1.5, 1.5, 0.6);
-containerThreeLoc = transl(1.6, 1.5, 0.6);
+containerOneLoc = transl(1.6, 1.4, 0.6)*trotx(pi);
+containerTwoLoc = transl(1.5, 1.6, 0.6)*trotx(pi);
+containerThreeLoc = transl(1.6, 1.8, 0.6)*trotx(pi);
 
 %ContainerOneLoc = transl(1.41, 1, 0.25);
 
@@ -119,8 +119,6 @@ for z = 0.7:0.05:1.1
 end
 
 %Warning Sign
-
-%%
 x = [0.9 0.9; 0.9 0.9];
 y = [1.4 1.6; 1.4 1.6];
 z = [1.2 1.2; 1 1]; 
@@ -130,18 +128,42 @@ warningSign_h = background('WarningSign.jpg', x, y, z);
 
 %% Import Cutlery
 
-spoonLoc = transl(1.7, 1.5, 0.6);
-forkLoc = transl(1.8, 1.5, 0.6);
-knifeLoc = transl(1.9, 1.5, 0.6);
+spoonLoc = transl(1.65, 1.5, 0.6)*trotx(pi);
+spoonLocTwo = transl(1.6, 1.6, 0.6)*trotx(pi);
+spoonLocThree = transl(1.65, 1.3, 0.6)*trotx(pi);
+forkLoc = transl(1.6, 1.4, 0.6)*trotx(pi);
+forkLocTwo = transl(1.6, 1.65, 0.6)*trotx(pi)*trotz(pi/2);
+forkLocThree = transl(1.65, 1.7, 0.6)*trotx(pi);
+knifeLoc = transl(1.6, 1.25, 0.6)*trotx(pi);
+knifeLocTwo = transl(1.68, 1.35, 0.6)*trotx(pi);
+knifeLocThree = transl(1.71, 1.7, 0.6)*trotx(pi);
 
 [spoonMesh, spoonVertexCount, spoonVerts] = PlotCutlery('Spoon.ply', spoonLoc(1,4), spoonLoc(2,4), spoonLoc(3,4));
 spoonMesh_h = spoonMesh; 
 
+[spoonMesh, spoonVertexCountTwo, spoonVertsTwo] = PlotCutlery('Spoon.ply', spoonLocTwo(1,4), spoonLocTwo(2,4), spoonLocTwo(3,4));
+spoonMeshTwo_h = spoonMesh; 
+
+[spoonMesh, spoonVertexCountThree, spoonVertsThree] = PlotCutlery('Spoon.ply', spoonLocThree(1,4), spoonLocThree(2,4), spoonLocThree(3,4));
+spoonMeshThree_h = spoonMesh; 
+
 [forkMesh, forkVertexCount, forkVerts] = PlotCutlery('Fork.ply', forkLoc(1,4), forkLoc(2,4), forkLoc(3,4));
 forkMesh_h = forkMesh;
 
+[forkMesh, forkVertexCountTwo, forkVertsTwo] = PlotCutlery('Fork.ply', forkLocTwo(1,4), forkLocTwo(2,4), forkLocTwo(3,4));
+forkMeshTwo_h = forkMesh;
+
+[forkMesh, forkVertexCountThree, forkVertsThree] = PlotCutlery('Fork.ply', forkLocThree(1,4), forkLocThree(2,4), forkLocThree(3,4));
+forkMeshThree_h = forkMesh;
+
 [knifeMesh, knifeVertexCount, knifeVerts] = PlotCutlery('Knife.ply', knifeLoc(1,4), knifeLoc(2,4), knifeLoc(3,4));
 knifeMesh_h = knifeMesh;
+
+[knifeMesh, knifeVertexCountTwo, knifeVertsTwo] = PlotCutlery('Knife.ply', knifeLocTwo(1,4), knifeLocTwo(2,4), knifeLocTwo(3,4));
+knifeMeshTwo_h = knifeMesh;
+
+[knifeMesh, knifeVertexCountThree, knifeVertsThree] = PlotCutlery('Knife.ply', knifeLocThree(1,4), knifeLocThree(2,4), knifeLocThree(3,4));
+knifeMeshThree_h = knifeMesh;
 
 %% Visual Servoing
 %The Visual Servoing Section was taken from Lab 8 Solution 
@@ -422,15 +444,52 @@ qMatrix = nan(steps, 6); %Memory allocation
 %Pick up Spoon - HomePose to SpoonLoc, Spoon Loc to containerOne
 %
 qSpoon = robot.model.ikcon(spoonLoc);
+qSpoonTwo = robot.model.ikcon(spoonLocTwo);
+qSpoonThree = robot.model.ikcon(spoonLocThree);
+qFork = robot.model.ikcon(forkLoc);
+qForkTwo = robot.model.ikcon(forkLocTwo);
+qForkThree = robot.model.ikcon(forkLocThree);
+qKnife = robot.model.ikcon(knifeLoc);
+qKnifeTwo = robot.model.ikcon(knifeLocTwo);
+qKnifeThree = robot.model.ikcon(knifeLocThree);
 qContainerOne = robot.model.ikcon(containerOneLoc);
-qContainerTwo = robot.model.ikcon(containerTwoLoc);
+qContainerTwo = robot.model.ikcon(containerTwoLoc*transl(0,0,0.2));
 qContainerThree = robot.model.ikcon(containerThreeLoc);
-    
+%%
+qNew = [deg2rad(-20) deg2rad(260) pi/2 pi/2 2*pi 0];
+jacoMove(qNew, qContainerOne, robot);
+
+
+%%
+%Sort spoons:
 jacoMove(qHomePose, qSpoon, robot);
 objectMove(qSpoon, qContainerThree, robot, spoonVerts, spoonVertexCount, spoonMesh_h);
+jacoMove(qContainerThree, qSpoonTwo, robot);
+objectMove(qSpoonTwo, qContainerThree, robot, spoonVertsTwo, spoonVertexCountTwo, spoonMeshTwo_h);
+jacoMove(qContainerThree, qSpoonThree, robot);
+objectMove(qSpoonThree, qContainerThree, robot, spoonVertsThree, spoonVertexCountThree, spoonMeshThree_h);
 jacoMove(qContainerThree, qHomePose, robot);
 %
-
+%%
+%%
+%Sort forks:
+jacoMove(qHomePose, qFork, robot);
+objectMove(qFork, qContainerTwo, robot, forkVerts, forkVertexCount, forkMesh_h);
+jacoMove(qContainerTwo, qForkTwo, robot);
+objectMove(qForkTwo, qContainerThree, robot, forkVertsTwo, forkVertexCountTwo, forkMeshTwo_h);
+jacoMove(qContainerTwo, qForkThree, robot);
+objectMove(qForkThree, qContainerTwo, robot, forkVertsThree, forkVertexCountThree, forkMeshThree_h);
+jacoMove(qContainerTwo, qHomePose, robot);
+%%
+%Sort Knives:
+jacoMove(qHomePose, qKnife, robot);
+objectMove(qKnife, qContainerOne, robot, knifeVerts, knifeVertexCount, knifeMesh_h);
+jacoMove(qContainerOne, qKnifeTwo, robot);
+objectMove(qKnifeTwo, qContainerOne, robot, knifeVertsTwo, knifeVertexCountTwo, knifeMeshTwo_h);
+jacoMove(qContainerOne, qKnifeThree, robot);
+objectMove(qKnifeThree, qContainerOne, robot, knifeVertsThree, knifeVertexCountThree, knifeMeshThree_h);
+jacoMove(qContainerOne, qHomePose, robot);
+%%
 for i = 1:steps
     qMatrix(i,:) = (1-s(i))*qHomePose + s(i)*qSpoon;
     robot.model.animate(qMatrix(i,:));
@@ -458,7 +517,7 @@ end
 %%
 ForcedCollisionLoc = transl(1.4, 2.5, 0.9)*trotx(pi);
 qForcedCollision = robot.model.ikcon(ForcedCollisionLoc);
-qStart = [0 0 0 0 0 0];
+qStart = [pi/2 pi deg2rad(341) pi/2 2*pi 0];
 % statusFlag = 0;
 % steps = 50;
 % s = lspb(0,1,steps); %Scalar function
@@ -491,4 +550,133 @@ statusFlag = jacoMoveToCollision(qStart,qForcedCollision,robot, wallMesh_h);
 if statusFlag == 1
     display("noooo staoooop");
     pause();
+end
+
+%%
+qStart = qHomePose;
+qFinish = robot.model.ikcon(containerThreeLoc);
+faces = wallMesh_h.Faces;
+vertex = wallMesh_h.Vertices;
+faceNormals = wallMesh_h.FaceNormals;
+
+robot.model.animate(qStart);
+qWaypoints = [qStart;qFinish];
+CheckForCollision = true;
+checkedTillWaypoint = 1;
+qMatrix = [];
+while (CheckForCollision)
+    startWaypoint = checkedTillWaypoint;
+    for i = startWaypoint:size(qWaypoints,1)-1
+        qMatrixJoin = InterpolateWaypointRadians(qWaypoints(i:i+1,:),deg2rad(10));
+        if ~CheckForCollision(robot,qMatrixJoin,faces,vertex,faceNormals)
+            qMatrix = [qMatrix; qMatrixJoin]; %#ok<AGROW>
+            robot.model.animate(qMatrixJoin);
+            size(qMatrix)
+            CheckForCollision = false;
+            checkedTillWaypoint = i+1;
+            % Now try and join to the final goal (q2)
+            qMatrixJoin = InterpolateWaypointRadians([qMatrix(end,:); q2],deg2rad(10));
+            if ~IsCollision(robot,qMatrixJoin,faces,vertex,faceNormals)
+                qMatrix = [qMatrix;qMatrixJoin];
+                % Reached goal without collision, so break out
+                break;
+            end
+        else
+            % Randomly pick a pose that is not in collision
+            qRand = (2 * rand(1,3) - 1) * pi;
+            while checkForCollision(robot,qRand,faces,vertex,faceNormals)
+                qRand = (2 * rand(1,3) - 1) * pi;
+            end
+            qWaypoints =[ qWaypoints(1:i,:); qRand; qWaypoints(i+1:end,:)];
+            CheckForCollision = true;
+            break;
+        end
+    end
+end
+robot.model.animate(qMatrix)
+
+%% IsCollision
+% This is based upon the output of questions 2.5 and 2.6
+% Given a robot model (robot), and trajectory (i.e. joint state vector) (qMatrix)
+% and triangle obstacles in the environment (faces,vertex,faceNormals)
+function result = IsCollision(robot,qMatrix,faces,vertex,faceNormals,returnOnceFound)
+if nargin < 6
+    returnOnceFound = true;
+end
+result = false;
+
+for qIndex = 1:size(qMatrix,1)
+    % Get the transform of every joint (i.e. start and end of every link)
+    tr = GetLinkPoses(qMatrix(qIndex,:), robot);
+
+    % Go through each link and also each triangle face
+    for i = 1 : size(tr,3)-1    
+        for faceIndex = 1:size(faces,1)
+            vertOnPlane = vertex(faces(faceIndex,1)',:);
+            [intersectP,check] = LinePlaneIntersection(faceNormals(faceIndex,:),vertOnPlane,tr(1:3,4,i)',tr(1:3,4,i+1)'); 
+            if check == 1 && IsIntersectionPointInsideTriangle(intersectP,vertex(faces(faceIndex,:)',:))
+                plot3(intersectP(1),intersectP(2),intersectP(3),'g*');
+                display('Intersection');
+                result = true;
+                if returnOnceFound
+                    return
+                end
+            end
+        end    
+    end
+end
+end
+
+%% GetLinkPoses
+% q - robot joint angles
+% robot -  seriallink robot model
+% transforms - list of transforms
+function [ transforms ] = GetLinkPoses( q, robot)
+transforms = zeros(4,4,robot.model.n+1);
+    transforms(:,:,1) = robot.model.base;
+    Links = robot.model.links;
+    for i = 1 : robot.model.n
+        transforms(:,:,i+1) = transforms(:,:,i) * trotz(q(i)+Links(i).offset) * transl(0,0,Links(i).d) * transl(Links(i).a,0,0) * trotx(Links(i).alpha);
+    end
+% links = robot.model.links;
+% transforms = zeros(4, 4, length(links) + 1);
+% transforms(:,:,1) = robot.model.base;
+% 
+% for i = 1:length(links)
+%     L = links(1,i);
+%     
+%     current_transform = transforms(:,:, i);
+%     
+%     current_transform = current_transform * trotz(q(1,i) + L.offset) * ...
+%     transl(0,0, L.d) * transl(L.a,0,0) * trotx(L.alpha);
+%     transforms(:,:,i + 1) = current_transform;
+% end
+end
+
+%% FineInterpolation
+% Use results from Q2.6 to keep calling jtraj until all step sizes are
+% smaller than a given max steps size
+function qMatrix = FineInterpolation(q1,q2,maxStepRadians)
+if nargin < 3
+    maxStepRadians = deg2rad(1);
+end
+    
+steps = 2;
+while ~isempty(find(maxStepRadians < abs(diff(jtraj(q1,q2,steps))),1))
+    steps = steps + 1;
+end
+qMatrix = jtraj(q1,q2,steps);
+end
+
+%% InterpolateWaypointRadians
+% Given a set of waypoints, finely intepolate them
+function qMatrix = InterpolateWaypointRadians(waypointRadians,maxStepRadians)
+if nargin < 2
+    maxStepRadians = deg2rad(1);
+end
+
+qMatrix = [];
+for i = 1: size(waypointRadians,1)-1
+    qMatrix = [qMatrix ; FineInterpolation(waypointRadians(i,:),waypointRadians(i+1,:),maxStepRadians)]; %#ok<AGROW>
+end
 end
