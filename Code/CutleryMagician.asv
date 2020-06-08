@@ -417,13 +417,13 @@ end
 
 
 %%
-ForcedCollisionLoc = transl(1.4, 2.5, 0.9)*trotx(pi);
+ForcedCollisionLoc = transl(2, 2.5, 0.7)*trotx(pi/2);
 qForcedCollision = robot.model.ikcon(ForcedCollisionLoc);
 qStart = [0 0 0 0 0 0];
-% statusFlag = 0;
-% steps = 50;
-% s = lspb(0,1,steps); %Scalar function
-% qMatrix = nan(steps, 6); %Memory allocation
+statusFlag = 0;
+steps = 50;
+s = lspb(0,1,steps); %Scalar function
+qMatrix = nan(steps, 6); %Memory allocation
 
 % qMatrix = robot.model.getpos();
 % collisionStatus = CheckForCollision(robot, qMatrix, wallMesh_h.Vertices, wallMesh_h.Faces, wallMesh_h.FaceNormals) 
@@ -433,23 +433,21 @@ qStart = [0 0 0 0 0 0];
 %               
 %      end
 
-% for i = 1:2:steps
-%     
-%     qMatrix(i,:) = (1-s(i))*qStart + s(i)*qForcedCollision;
-%     %transform = robot.model.fkine(qMatrix(i,:));
-%     qCurrent = robot.model.getpos();
-%     collisionStatus = CheckForCollision(robot, qCurrent, wallMesh_h.Vertices, wallMesh_h.Faces, wallMesh_h.FaceNormals) 
-%     if collisionStatus == 1
-%       display("robot collision");
-%         
-%               
-%      end
-%     robot.model.animate(qMatrix(i,:));
-% end
-
-
-statusFlag = jacoMoveToCollision(qStart,qForcedCollision,robot, wallMesh_h);
-if statusFlag == 1
-    display("noooo staoooop");
-    pause();
+for i = 1:2:steps
+    
+    qMatrix(i,:) = (1-s(i))*qStart + s(i)*qForcedCollision;
+    %transform = robot.model.fkine(qMatrix(i,:));
+    qCurrent = robot.model.getpos();
+    collisionStatus = CheckForCollision(robot, qCurrent, wallMesh_h.Vertices, wallMesh_h.Faces, wallMesh_h.FaceNormals) 
+    if collisionStatus == 1
+      display("robot collision");
+        
+              
+     end
+    robot.model.animate(qMatrix(i,:));
 end
+
+% statusFlag = jacoMoveToCollision(qStart, qForcedCollision, robot, wallMesh_h)
+% if statusFlag == 1
+%     display("robot collision");
+% end
