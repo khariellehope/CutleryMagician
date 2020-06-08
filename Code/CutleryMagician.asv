@@ -139,52 +139,52 @@ forkMesh_h = forkMesh;
 [knifeMesh, knifeVertexCount, knifeVerts] = PlotCutlery('Knife.ply', knifeLoc(1,4), knifeLoc(2,4), knifeLoc(3,4));
 knifeMesh_h = knifeMesh;
 
-% %% Visual Servoing and RMRC
-% %Please note that some of these sections were taken from Lab8Solution
-% 
-% pWarning = ; %Image target points in image lane
-% targetPoints = [x x x x; y y y y; z z z z];
-% qInitial = [];
-% cam = CentralCamera('focal', 0.08', 'pixel', 10e-5, ...
-%     'resolution', [1024 1024], 'centre', [500 500], 'name', 'CM Cam');
-% fps = 25;
-% lambda = 0.6 %Gain
-% depth = mean (pWarning(1,:));
-% 
-% jcTr = robot.model.fkine(qInitial);
-% robot.model.animate(qInitial');
-% drawnow
-% 
-% cam.T = jcTr; %Plots cam 
-% cam.plot_camera('Tcam', jcTr, 'label', 'scale', 0.15);%Display points in cam
-% plot_sphere(pWarning, 0.01, 'r');%Display points in 3d
-% 
-% 
-% p = cam.plot(pWarning, 'Tcam', jcTr);
-% 
-% cam.clf();
-% cam.plot(targetPoints), '*');
-% cam.hold(true);
-% cam.plot(pWarning, 'Tcam', jcTr, 'o');
-% pause(2);
-% cam.hold(true);
-% cam.plot(pWarning); %Plot initial View
-% 
-% vel_p = [];
-% uv_p = [];
-% history = [];
-% 
-% %Visual Servo Loop 
-% 
-% ksteps = 0;
-% while true
-%     ksteps=ksteps +1;
-%     uv = cam.plot(pWarning)
-%     e = targetPoints - uv;
-%     e = e(:);
-%     Zest = [];
-%     
-%     if isempty(depth)
+%% Visual Servoing and RMRC
+%Please note that some of these sections were taken from Lab8Solution
+
+pWarning = ; %Image target points in image lane
+targetPoints = [x x x x; y y y y; z z z z];
+qInitial = [];
+cam = CentralCamera('focal', 0.08', 'pixel', 10e-5, ...
+    'resolution', [1024 1024], 'centre', [500 500], 'name', 'CM Cam');
+fps = 25;
+lambda = 0.6 %Gain
+depth = mean (pWarning(1,:));
+
+jcTr = robot.model.fkine(qInitial);
+robot.model.animate(qInitial');
+drawnow
+
+cam.T = jcTr; %Plots cam 
+cam.plot_camera('Tcam', jcTr, 'label', 'scale', 0.15);%Display points in cam
+plot_sphere(pWarning, 0.01, 'r');%Display points in 3d
+
+
+p = cam.plot(pWarning, 'Tcam', jcTr);
+
+cam.clf();
+cam.plot(targetPoints), '*');
+cam.hold(true);
+cam.plot(pWarning, 'Tcam', jcTr, 'o');
+pause(2);
+cam.hold(true);
+cam.plot(pWarning); %Plot initial View
+
+vel_p = [];
+uv_p = [];
+history = [];
+
+%Visual Servo Loop 
+
+ksteps = 0;
+while true
+    ksteps=ksteps +1;
+    uv = cam.plot(pWarning)
+    e = targetPoints - uv;
+    e = e(:);
+    Zest = [];
+    
+    if isempty(depth)
 
 %% Collision avoidance?
 %if collision == 1, then stop robot, if =0; continue movement
