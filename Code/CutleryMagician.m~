@@ -80,11 +80,6 @@ hold on;
 %%
 %Safety Features - i.e eStop, encasing, 
 eStopLoc = transl(2.6, 1.2, 0.6);            %Location needs to be fixed up, this is a random number5
-barrier1Loc = transl(0.8, 1.5, 0.7);
-barrier2Loc = transl(2.5, 1.5, 0.7);
-barrier3Loc = transl(1.1, 1.9, 0.7);
-barrier4Loc = transl(2.1, 1.9, 0.7);
-
 
 %eStop
 partMesh = Environment('eStop.ply', eStopLoc(1,4), eStopLoc(2,4), eStopLoc(3,4)); %Rescale Estop lol
@@ -92,24 +87,30 @@ eStopMesh_h = partMesh;
 hold on;
 
 %Barrier
-
-partMesh = Environment('SafetyBarrier.ply', barrier1Loc(1,4), barrier1Loc(2,4), barrier1Loc(3,4));
-barrierMesh_h = partMesh;
+wallLoc = transl(0.9, 2.1, 1.05);
+partMesh = Environment('Wall.ply', wallLoc(1,4), wallLoc(2,4), wallLoc(3,4));
+wallMesh_h = partMesh;
 hold on;
 
-partMesh = Environment('SafetyBarrier.ply', barrier2Loc(1,4), barrier2Loc(2,4), barrier2Loc(3,4));
-barrier2Mesh_h = partMesh;
-hold on;
+%Barrier
 
-%Barriers against wall
-
-partMesh = Environment('SafetyBarrier2.ply', barrier3Loc(1,4), barrier3Loc(2,4), barrier3Loc(3,4));
-barrier3Mesh_h = partMesh;
-hold on;
-
-partMesh = Environment('SafetyBarrier2.ply', barrier4Loc(1,4), barrier4Loc(2,4), barrier4Loc(3,4));
-barrier4Mesh_h = partMesh;
-hold on;
+% partMesh = Environment('SafetyBarrier.ply', barrier1Loc(1,4), barrier1Loc(2,4), barrier1Loc(3,4));
+% barrierMesh_h = partMesh;
+% hold on;
+% 
+% partMesh = Environment('SafetyBarrier.ply', barrier2Loc(1,4), barrier2Loc(2,4), barrier2Loc(3,4));
+% barrier2Mesh_h = partMesh;
+% hold on;
+% 
+% %Barriers against wall
+% 
+% partMesh = Environment('SafetyBarrier2.ply', barrier3Loc(1,4), barrier3Loc(2,4), barrier3Loc(3,4));
+% barrier3Mesh_h = partMesh;
+% hold on;
+% 
+% partMesh = Environment('SafetyBarrier2.ply', barrier4Loc(1,4), barrier4Loc(2,4), barrier4Loc(3,4));
+% barrier4Mesh_h = partMesh;
+% hold on;
 
 %Light Curtain
 
@@ -119,31 +120,12 @@ end
 
 %Warning Sign
 
-x = [0.8 0.8; 0.8 0.8];
-y = [1.3 1.7; 1.3 1.7];
-z = [1.5 1.5; 1.1 1.1]; 
+%%
+x = [0.9 0.9; 0.9 0.9];
+y = [1.4 1.6; 1.4 1.6];
+z = [1.2 1.2; 1 1]; 
+
 warningSign_h = background('WarningSign.jpg', x, y, z);
-
-%% Simulate hand passing through light curtain
-
-
-%hand
-% 
-% for y = 0.3:0.05:0.7
-%     handLoc = transl(1, y, 0.4);
-%     partMesh = Environment('hand2.ply', handLoc(1,4), handLoc(2,4), handLoc(3,4));
-%     handMesh_h = partMesh;
-%     drawnow;
-%     delete(handMesh_h);
-% end
-% 
-% handLoc = transl(1, 0.7, 0.4);
-% partMesh = Environment('hand2.ply', handLoc(1,4), handLoc(2,4), handLoc(3,4));
-% handMesh_h = partMesh;
-%     
-% pause();
-%     
-% delete(handMesh_h);
 
 
 %% Import Cutlery
@@ -170,7 +152,8 @@ pWarning = [310 510 610; 610 250 620];
 targetPoints = [0.8 0.8 0.8;
     1.35 1.5 1.65; 
     1.1 01.5 1.1];
-qInitial = [0 pi deg2rad(341) deg2rad(200) -pi/2 pi];
+%qInitial = [0 pi deg2rad(341) deg2rad(200) -pi/2 pi];
+qInitial = [0 pi pi deg2rad(-238) deg2rad(133) deg2rad(150)];
 cam = CentralCamera('focal', 0.08', 'pixel', 10e-5, ...
     'resolution', [1024 1024], 'centre', [500 500], 'name', 'CM Cam');
 fps = 100;
@@ -271,7 +254,8 @@ while true
         qInitial = q;%update current joint position
 end
 
-Tr = robot.model.fkine(robot.model.getpos());
+T = robot.model.fkine(robot.model.getpos());
+q0 = robot.model.getpos();
 
 % Plot results (from Lab8Solution)
 % figure()            
@@ -305,15 +289,55 @@ angleError = zeros(3,steps);    % For plotting trajectory error
 
 %Set up trajectory, initial pose
 
+homeT = robot.model.fkine(qHomePose);
+
 s = lspb(0,1,steps);                % Trapezoidal trajectory scalar
 for i=1:steps
-    x(1,i) = (1-s(i))* + s(i)*0.35; % Points in x
-    x(2,i) = (1-s(i))*-0.55 + s(i)*0.55; % Points in y
-    x(3,i) = 0.5 + 0.2*sin(i*delta); % Points in z
+    x(1,i) = (1-s(i))*T(1,4) + s(i)*homeT(1,4); % Points in x
+    x(2,i) = (1-s(i))*T(2,4) + s(i)*homeT(2,4); % Points in y
+    x(3,i) = (1-s(i))*T(3,4) + s(i)*homeT(3,4); % Points in z
     theta(1,i) = 0;                 % Roll angle 
-    theta(2,i) = 5*pi/9;            % Pitch angle
+    theta(2,i) = 0;            % Pitch angle
     theta(3,i) = 0;                 % Yaw angle
 end
+
+qMatrix(1,:) = robot.model.ikcon(T, q0);
+
+for i = 1:steps-1
+    T = robot.model.fkine(qMatrix(i,:));                                           % Get forward transformation at current joint state
+    deltaX = x(:,i+1) - T(1:3,4);                                         	% Get position error from next waypoint
+    Rd = rpy2r(theta(1,i+1),theta(2,i+1),theta(3,i+1));                     % Get next RPY angles, convert to rotation matrix
+    Ra = T(1:3,1:3);                                                        % Current end-effector rotation matrix
+    Rdot = (1/deltaT)*(Rd - Ra);                                                % Calculate rotation matrix error
+    S = Rdot*Ra';                                                           % Skew symmetric!
+    linear_velocity = (1/deltaT)*deltaX;
+    angular_velocity = [S(3,2);S(1,3);S(2,1)];                              % Check the structure of Skew Symmetric matrix!!
+    deltaTheta = tr2rpy(Rd*Ra');                                            % Convert rotation matrix to RPY angles
+    xdot = W*[linear_velocity;angular_velocity];                          	% Calculate end-effector velocity to reach next waypoint.
+    J = robot.model.jacob0(qMatrix(i,:));                 % Get Jacobian at current joint state
+    m(i) = sqrt(det(J*J'));
+    if m(i) < epsilon  % If manipulability is less than given threshold
+        lambda = (1 - m(i)/epsilon)*5E-2;
+    else
+        lambda = 0;
+    end
+    invJ = inv(J'*J + lambda *eye(6))*J';                                   % DLS Inverse
+    qdot(i,:) = (invJ*xdot)';                                                % Solve the RMRC equation (you may need to transpose the         vector)
+    for j = 1:6                                                             % Loop through joints 1 to 6
+        if qMatrix(i,j) + deltaT*qdot(i,j) < robot.model.qlim(j,1)                     % If next joint angle is lower than joint limit...
+            qdot(i,j) = 0; % Stop the motor
+        elseif qMatrix(i,j) + deltaT*qdot(i,j) > robot.model.qlim(j,2)                 % If next joint angle is greater than joint limit ...
+            qdot(i,j) = 0; % Stop the motor
+        end
+    end
+    qMatrix(i+1,:) = qMatrix(i,:) + deltaT*qdot(i,:);                         	% Update next joint state based on joint velocities
+    positionError(:,i) = x(:,i+1) - T(1:3,4);                               % For plotting
+    angleError(:,i) = deltaTheta;                                           % For plotting
+end
+
+%figure(1)
+plot3(x(1,:),x(2,:),x(3,:),'k.','LineWidth',1)
+robot.model.plot(qMatrix,'trail','r-')
 
 %% Collision avoidance?
 %if collision == 1, then stop robot, if =0; continue movement
@@ -378,19 +402,7 @@ end
 % 
 % pause();
 % delete(maxReach);
-%% Sensor data?
 
-%% Estop Check
-%This should be put within the movement function later. ie Check for estop
-%and collisions before robot arm moves
-% 
-% if eStopButton ~= 0
-%     display('EMERGENCY STOP');
-%     while eStopPressed ~= 0
-%         pause(1);
-%     end
-%     
-% end
 
 %% Movement
 %Testing movement of arm from cutlery to containers. Will be changed to
