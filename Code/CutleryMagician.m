@@ -80,11 +80,6 @@ hold on;
 %%
 %Safety Features - i.e eStop, encasing, 
 eStopLoc = transl(2.6, 1.2, 0.6);            %Location needs to be fixed up, this is a random number5
-barrier1Loc = transl(0.8, 1.5, 0.7);
-barrier2Loc = transl(2.5, 1.5, 0.7);
-barrier3Loc = transl(1.1, 1.9, 0.7);
-barrier4Loc = transl(2.1, 1.9, 0.7);
-
 
 %eStop
 partMesh = Environment('eStop.ply', eStopLoc(1,4), eStopLoc(2,4), eStopLoc(3,4)); %Rescale Estop lol
@@ -92,24 +87,30 @@ eStopMesh_h = partMesh;
 hold on;
 
 %Barrier
-
-partMesh = Environment('SafetyBarrier.ply', barrier1Loc(1,4), barrier1Loc(2,4), barrier1Loc(3,4));
-barrierMesh_h = partMesh;
+wallLoc = transl(0.9, 2.1, 1.05);
+partMesh = Environment('Wall.ply', wallLoc(1,4), wallLoc(2,4), wallLoc(3,4));
+wallMesh_h = partMesh;
 hold on;
 
-partMesh = Environment('SafetyBarrier.ply', barrier2Loc(1,4), barrier2Loc(2,4), barrier2Loc(3,4));
-barrier2Mesh_h = partMesh;
-hold on;
+%Barrier
 
-%Barriers against wall
-
-partMesh = Environment('SafetyBarrier2.ply', barrier3Loc(1,4), barrier3Loc(2,4), barrier3Loc(3,4));
-barrier3Mesh_h = partMesh;
-hold on;
-
-partMesh = Environment('SafetyBarrier2.ply', barrier4Loc(1,4), barrier4Loc(2,4), barrier4Loc(3,4));
-barrier4Mesh_h = partMesh;
-hold on;
+% partMesh = Environment('SafetyBarrier.ply', barrier1Loc(1,4), barrier1Loc(2,4), barrier1Loc(3,4));
+% barrierMesh_h = partMesh;
+% hold on;
+% 
+% partMesh = Environment('SafetyBarrier.ply', barrier2Loc(1,4), barrier2Loc(2,4), barrier2Loc(3,4));
+% barrier2Mesh_h = partMesh;
+% hold on;
+% 
+% %Barriers against wall
+% 
+% partMesh = Environment('SafetyBarrier2.ply', barrier3Loc(1,4), barrier3Loc(2,4), barrier3Loc(3,4));
+% barrier3Mesh_h = partMesh;
+% hold on;
+% 
+% partMesh = Environment('SafetyBarrier2.ply', barrier4Loc(1,4), barrier4Loc(2,4), barrier4Loc(3,4));
+% barrier4Mesh_h = partMesh;
+% hold on;
 
 %Light Curtain
 
@@ -119,31 +120,10 @@ end
 
 %Warning Sign
 
-x = [1.1 1.1; 1.1 1.1];
+x = [0.9 0.9; 0.9 0.9];
 y = [1.4 1.6; 1.4 1.6];
-z = [1.4 1.4; 1.2 1.2]; 
+z = [1.2 1.2; 1 1]; 
 warningSign_h = background('WarningSign.jpg', x, y, z);
-
-%% Simulate hand passing through light curtain
-
-
-%hand
-% 
-% for y = 0.3:0.05:0.7
-%     handLoc = transl(1, y, 0.4);
-%     partMesh = Environment('hand2.ply', handLoc(1,4), handLoc(2,4), handLoc(3,4));
-%     handMesh_h = partMesh;
-%     drawnow;
-%     delete(handMesh_h);
-% end
-% 
-% handLoc = transl(1, 0.7, 0.4);
-% partMesh = Environment('hand2.ply', handLoc(1,4), handLoc(2,4), handLoc(3,4));
-% handMesh_h = partMesh;
-%     
-% pause();
-%     
-% delete(handMesh_h);
 
 
 %% Import Cutlery
@@ -375,19 +355,7 @@ end
 % 
 % pause();
 % delete(maxReach);
-%% Sensor data?
 
-%% Estop Check
-%This should be put within the movement function later. ie Check for estop
-%and collisions before robot arm moves
-% 
-% if eStopButton ~= 0
-%     display('EMERGENCY STOP');
-%     while eStopPressed ~= 0
-%         pause(1);
-%     end
-%     
-% end
 
 %% Movement
 %Testing movement of arm from cutlery to containers. Will be changed to
