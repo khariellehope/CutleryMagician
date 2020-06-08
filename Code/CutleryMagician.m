@@ -119,9 +119,9 @@ end
 
 %Warning Sign
 
-x = [1.1 1.1; 1.1 1.1];
-y = [1.4 1.6; 1.4 1.6];
-z = [1.4 1.4; 1.2 1.2]; 
+x = [0.8 0.8; 0.8 0.8];
+y = [1.3 1.7; 1.3 1.7];
+z = [1.5 1.5; 1.1 1.1]; 
 warningSign_h = background('WarningSign.jpg', x, y, z);
 
 %% Simulate hand passing through light curtain
@@ -164,32 +164,36 @@ knifeMesh_h = knifeMesh;
 %% Visual Servoing
 %The Visual Servoing Section was taken from Lab 8 Solution 
 
-pWarning = [212 512 812; 700 250 700]; %Image target points in image plane
-targetPoints = [0.6 0.6 0.6;
-    0.9 1.01 1.1; 
-    0.71 0.9 0.71;];
-qInitial = [-0.0026 1.5080 1.0060 1.6336 3.0708 0];
+%pWarning = [212 512 812; 700 250 700]; %Image target points in image plane
+%pWarning = [320 700 720; 650 850 550];
+pWarning = [310 510 610; 610 250 620];
+targetPoints = [0.8 0.8 0.8;
+    1.35 1.5 1.65; 
+    1.1 01.5 1.1];
+%qInitial = [0 pi deg2rad(341) deg2rad(200) -pi/2 pi];
+qInitial = [0 pi pi deg2rad(-238) deg2rad(133) deg2rad(150)];
 cam = CentralCamera('focal', 0.08', 'pixel', 10e-5, ...
     'resolution', [1024 1024], 'centre', [500 500], 'name', 'CM Cam');
-fps = 25;
+fps = 100;
 lambda = 0.6 %Gain
-depth = mean (targetPoints(1,:));
+%depth = mean (targetPoints(1,:));
+depth = 1;
 % Initialise visual servo sim 3d display
-jcTr = robot.model.fkine(qInitial);
+jcTr = robot.model.fkine(qInitial); %Transform of EE initial pos
 robot.model.animate(qInitial);
 drawnow
 
 cam.T = jcTr; %Plots cam 
-cam.plot_camera('Tcam', jcTr, 'label', 'scale', 0.15);%Display points in cam
+cam.plot_camera('Tcam', jcTr, 'label', 'scale', 0.15);%Plot cam on EE
 plot_sphere(targetPoints, 0.01, 'y');%Display points in 3d
 
 % Initialise sim image view display
-p = cam.plot(targetPoints, 'Tcam', jcTr); %project points to image
+p = cam.plot(targetPoints, 'Tcam', jcTr); %project points to image (current view of cam)
 
-cam.clf();
-cam.plot((pWarning), '*');
+%cam.clf();
+cam.plot(pWarning, '*');%Plot desired view
 cam.hold(true);
-cam.plot(targetPoints, 'Tcam', jcTr, 'o');%Create camera view
+cam.plot(targetPoints, 'Tcam', jcTr, 'o');%What the camera Sees
 pause(2);
 cam.hold(true);
 cam.plot(targetPoints); %Plot initial View
@@ -203,14 +207,14 @@ history = [];
 ksteps = 0;
 while true
     ksteps=ksteps +1;
-    uv = cam.plot(targetPoints) %compute view of cam
+    uv = cam.plot(targetPoints); %compute view of cam
     e = pWarning - uv; %feature error
     e = e(:);
     Zest = [];
     %compute jacobian
     if isempty(depth)
         %exact depth from sim
-        pt = homtrans(inv(Tcam), pWarning);
+        pt = homtrans(inv(Tcam), targetPoints);
         J = cam.visjac_p(uv, pt(3,:));
     elseif ~isempty(Zest)
         J = cam.visjac_p(uv, Zest);
@@ -234,16 +238,16 @@ while true
     if ~isempty(ind)
         qp(ind) = pi;
     end
-    ind = find(qp <= pi);
+    ind = find(qp <- pi);
     if ~isempty(ind)
         qp(ind)=-pi;
     end
     
         %update joints
-        q = qInitial + (1/fps) * qp;
+        q = qInitial + (1/fps) * qp';
         robot.model.animate(q);
         %get cam location
-        Tc = robot.model.fkine(q');
+        Tc = robot.model.fkine(q);
         cam.T = Tc;
         drawnow
         %update history variables
@@ -259,7 +263,7 @@ while true
         hist.qp = qp;
         hist.q = q;
         history = [history hist];
-        pause(1/fps);
+        pause(1/fps)
         
         if ~isempty(200)&& (ksteps > 200)
             break;
@@ -268,7 +272,7 @@ while true
         qInitial = q;%update current joint position
 end
 
-Tr = robot.model.fkine(robot.model.getpos());
+endTr = robot.model.fkine(robot.model.getpos());
 
 % Plot results (from Lab8Solution)
 % figure()            
@@ -302,9 +306,11 @@ angleError = zeros(3,steps);    % For plotting trajectory error
 
 %Set up trajectory, initial pose
 
+qInitial = [0 pi deg2rad(341) deg2rad(200) -pi/2 pi];
+
 s = lspb(0,1,steps);                % Trapezoidal trajectory scalar
 for i=1:steps
-    x(1,i) = (1-s(i))*0.35 + s(i)*0.35; % Points in x
+    x(1,i) = (1-s(i))* + s(i)*0.35; % Points in x
     x(2,i) = (1-s(i))*-0.55 + s(i)*0.55; % Points in y
     x(3,i) = 0.5 + 0.2*sin(i*delta); % Points in z
     theta(1,i) = 0;                 % Roll angle 
