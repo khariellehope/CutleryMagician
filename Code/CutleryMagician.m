@@ -5,9 +5,9 @@ clear all
 set(0,'DefaultFigureWindowStyle','docked');
 
 % Model Jaco arm
- 
-jacoBase = transl(1.5, 1,0.25);
-qHomePose = [0 pi 0 pi pi/2 0];                  %Change joint angles accordingly
+
+jacoBase = transl(1.5, 1,0.25)*trotz(pi);
+qHomePose = [0 0 0 0 0 0];                  %Change joint angles accordingly
 qTest = deg2rad([-0.1466,5.4629,3.6849,0,3.1416,0]); 
 %Get robot arm 
 robot = Jaco;                            %Calling the Jaco class
@@ -20,11 +20,8 @@ hold on;
 
 %% Import Environment
 
-%hand
-handLoc = transl(1, 0.3, 0.4);
-partMesh = Environment('hand2.ply', handLoc(1,4), handLoc(2,4), handLoc(3,4));
 %Kitchen Bench
-%%
+
 %Using environment function:
 xOffset = 0;
 yOffset = 0;
@@ -48,10 +45,7 @@ x = [2 -2.; 2 -2];
 y = [1.4 1.4; 1.4 1.4];
 z = [1 1; -0.6 -0.6]; 
 window_h = background('windowWall.jpg', x, y, z);
- 
-for z = 0.2:0.05:0.5
-    line('XData', [0.6 1.8], 'YData', [0.7 0.7], 'Zdata', [z z], 'Color', [0 1 0]);
-end
+
 
 %%
 %
@@ -96,10 +90,10 @@ barrier4Loc = transl(1.4, 1.4, 0.2);
 partMesh = Environment('eStop.ply', eStopLoc(1,4), eStopLoc(2,4), eStopLoc(3,4)); %Rescale Estop lol
 eStopMesh_h = partMesh;
 hold on;
-%%
+
 %Barrier
 
-partMesh = Environment('SafetyBarrier.ply', barrierLoc(1,4), barrierLoc(2,4), barrierLoc(3,4));
+partMesh = Environment('SafetyBarrier.ply', barrier1Loc(1,4), barrier1Loc(2,4), barrier1Loc(3,4));
 barrierMesh_h = partMesh;
 hold on;
 
@@ -123,8 +117,36 @@ for z = 0.2:0.05:0.6
     line('XData', [0.6 1.8], 'YData', [0.7 0.7], 'Zdata', [z z], 'Color', [1 0 0]);
 end
 
+%Warning Sign
 
-% Import Cutlery
+x = [0.6 0.6; 0.6 0.6];
+y = [0.9 1.1; 0.9 1.1];
+z = [0.9 0.9; 0.7 0.7]; 
+warningSign_h = background('WarningSign.jpg', x, y, z);
+
+%% Simulate hand passing through light curtain
+
+
+%hand
+% 
+% for y = 0.3:0.05:0.7
+%     handLoc = transl(1, y, 0.4);
+%     partMesh = Environment('hand2.ply', handLoc(1,4), handLoc(2,4), handLoc(3,4));
+%     handMesh_h = partMesh;
+%     drawnow;
+%     delete(handMesh_h);
+% end
+% 
+% handLoc = transl(1, 0.7, 0.4);
+% partMesh = Environment('hand2.ply', handLoc(1,4), handLoc(2,4), handLoc(3,4));
+% handMesh_h = partMesh;
+%     
+% pause();
+%     
+% delete(handMesh_h);
+
+
+%% Import Cutlery
 
 spoonLoc = transl(1.2, 1, 0.25);
 forkLoc = transl(1.3, 1, 0.25);
@@ -139,52 +161,156 @@ forkMesh_h = forkMesh;
 [knifeMesh, knifeVertexCount, knifeVerts] = PlotCutlery('Knife.ply', knifeLoc(1,4), knifeLoc(2,4), knifeLoc(3,4));
 knifeMesh_h = knifeMesh;
 
-% %% Visual Servoing and RMRC
-% %Please note that some of these sections were taken from Lab8Solution
-% 
-% pWarning = ; %Image target points in image lane
-% targetPoints = [x x x x; y y y y; z z z z];
-% qInitial = [];
-% cam = CentralCamera('focal', 0.08', 'pixel', 10e-5, ...
-%     'resolution', [1024 1024], 'centre', [500 500], 'name', 'CM Cam');
-% fps = 25;
-% lambda = 0.6 %Gain
-% depth = mean (pWarning(1,:));
-% 
-% jcTr = robot.model.fkine(qInitial);
-% robot.model.animate(qInitial');
-% drawnow
-% 
-% cam.T = jcTr; %Plots cam 
-% cam.plot_camera('Tcam', jcTr, 'label', 'scale', 0.15);%Display points in cam
-% plot_sphere(pWarning, 0.01, 'r');%Display points in 3d
-% 
-% 
-% p = cam.plot(pWarning, 'Tcam', jcTr);
-% 
-% cam.clf();
-% cam.plot(targetPoints), '*');
-% cam.hold(true);
-% cam.plot(pWarning, 'Tcam', jcTr, 'o');
-% pause(2);
-% cam.hold(true);
-% cam.plot(pWarning); %Plot initial View
-% 
-% vel_p = [];
-% uv_p = [];
-% history = [];
-% 
-% %Visual Servo Loop 
-% 
-% ksteps = 0;
-% while true
-%     ksteps=ksteps +1;
-%     uv = cam.plot(pWarning)
-%     e = targetPoints - uv;
-%     e = e(:);
-%     Zest = [];
-%     
-%     if isempty(depth)
+%% Visual Servoing
+%The Visual Servoing Section was taken from Lab 8 Solution 
+
+pWarning = [212 512 812; 700 250 700]; %Image target points in image plane
+targetPoints = [0.6 0.6 0.6;
+    0.9 1.01 1.1; 
+    0.71 0.9 0.71;];
+qInitial = [-0.0026 1.5080 1.0060 1.6336 3.0708 0];
+cam = CentralCamera('focal', 0.08', 'pixel', 10e-5, ...
+    'resolution', [1024 1024], 'centre', [500 500], 'name', 'CM Cam');
+fps = 25;
+lambda = 0.6 %Gain
+depth = mean (targetPoints(1,:));
+% Initialise visual servo sim 3d display
+jcTr = robot.model.fkine(qInitial);
+robot.model.animate(qInitial);
+drawnow
+
+cam.T = jcTr; %Plots cam 
+cam.plot_camera('Tcam', jcTr, 'label', 'scale', 0.15);%Display points in cam
+plot_sphere(targetPoints, 0.01, 'y');%Display points in 3d
+
+% Initialise sim image view display
+p = cam.plot(targetPoints, 'Tcam', jcTr); %project points to image
+
+cam.clf();
+cam.plot((pWarning), '*');
+cam.hold(true);
+cam.plot(targetPoints, 'Tcam', jcTr, 'o');%Create camera view
+pause(2);
+cam.hold(true);
+cam.plot(targetPoints); %Plot initial View
+
+vel_p = [];
+uv_p = [];
+history = [];
+%%
+%Visual Servo Loop 
+
+ksteps = 0;
+while true
+    ksteps=ksteps +1;
+    uv = cam.plot(targetPoints) %compute view of cam
+    e = pWarning - uv; %feature error
+    e = e(:);
+    Zest = [];
+    %compute jacobian
+    if isempty(depth)
+        %exact depth from sim
+        pt = homtrans(inv(Tcam), pWarning);
+        J = cam.visjac_p(uv, pt(3,:));
+    elseif ~isempty(Zest)
+        J = cam.visjac_p(uv, Zest);
+    else 
+        J = cam.visjac_p(uv, depth);
+    end
+     %compute velocity of cam in cam frame
+    try
+        v = lambda*pinv(J) * e;
+    catch
+        status = -1;
+        return
+    end
+    fprintf('v: %.3f %.3f %.3f %.3f %.3f %.3f\n', v);
+    %compute robot jacobian and inverse
+    J2 = robot.model.jacobn(qInitial);
+    Jinv = pinv(J2);
+    qp = Jinv*v; %get joint velocities
+    %max angular velocity cannot exceed 180 degs
+    ind = find(qp > pi);
+    if ~isempty(ind)
+        qp(ind) = pi;
+    end
+    ind = find(qp <= pi);
+    if ~isempty(ind)
+        qp(ind)=-pi;
+    end
+    
+        %update joints
+        q = qInitial + (1/fps) * qp;
+        robot.model.animate(q);
+        %get cam location
+        Tc = robot.model.fkine(q');
+        cam.T = Tc;
+        drawnow
+        %update history variables
+        hist.uv = uv(:);
+        vel = v;
+        hist.vel = vel;
+        hist.e = e;
+        hist.en = norm(e);
+        hist.jcond = cond(J);
+        hist.Tcam = Tc;
+        hist.vel_p = vel;
+        hist.uv_p = uv;
+        hist.qp = qp;
+        hist.q = q;
+        history = [history hist];
+        pause(1/fps);
+        
+        if ~isempty(200)&& (ksteps > 200)
+            break;
+        end
+        
+        qInitial = q;%update current joint position
+end
+
+Tr = robot.model.fkine(robot.model.getpos());
+
+% Plot results (from Lab8Solution)
+% figure()            
+% plot_p(history,pWarning,cam)
+% figure()
+% plot_camera(history)
+% figure()
+% plot_vel(history)
+% figure()
+% plot_robjointpos(history)
+% figure()
+% plot_robjointvel(history)
+
+%% Resolved motion rate control
+% From Lab 9 Solution Question 1
+
+t = 20;
+deltaT = 0.02;
+steps = t/deltaT;
+delta = 2*pi/steps;
+epsilon = 0.1; %Threshold val for manipulability/DLS
+W = diag([1 1 1 0.1 0.1 0.1]);
+
+m = zeros(steps,1);             % Array for Measure of Manipulability
+qMatrix = zeros(steps,6);       % Array for joint anglesR
+qdot = zeros(steps,6);          % Array for joint velocities
+theta = zeros(3,steps);         % Array for roll-pitch-yaw angles
+x = zeros(3,steps);             % Array for x-y-z trajectory
+positionError = zeros(3,steps); % For plotting trajectory error
+angleError = zeros(3,steps);    % For plotting trajectory error
+
+%Set up trajectory, initial pose
+
+s = lspb(0,1,steps);                % Trapezoidal trajectory scalar
+for i=1:steps
+    x(1,i) = (1-s(i))*0.35 + s(i)*0.35; % Points in x
+    x(2,i) = (1-s(i))*-0.55 + s(i)*0.55; % Points in y
+    x(3,i) = 0.5 + 0.2*sin(i*delta); % Points in z
+    theta(1,i) = 0;                 % Roll angle 
+    theta(2,i) = 5*pi/9;            % Pitch angle
+    theta(3,i) = 0;                 % Yaw angle
+end
 
 %% Collision avoidance?
 %if collision == 1, then stop robot, if =0; continue movement
