@@ -13,7 +13,7 @@ lightCurtainStatus = 0;            %Set status flag as 0 first - Without this, t
             vertOnPlane = vertex(faces(faceIndex,1)',:);
             [intersectP, check] = LinePlaneIntersection(faceNormals(faceIndex,:),vertOnPlane,startPoints(i,:),finishPoints(i,:)); 
             if check == 1 && IsIntersectionPointInsideTriangle(intersectP,vertex(faces(faceIndex,:)',:))
-                plot3(intersectP(1),intersectP(2),intersectP(3),'b*');
+                %plot3(intersectP(1),intersectP(2),intersectP(3),'b*');
                 display('Intersection');
                 lightCurtainStatus = 1;
             if returnOnceFound
