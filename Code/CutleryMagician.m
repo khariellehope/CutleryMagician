@@ -128,25 +128,18 @@ warningSign_h = background('WarningSign.jpg', x, y, z);
 
 %% Import Cutlery
 
-% spoonLoc = transl(1.8, 1.6, 0.6)*trotx(pi);
-% spoonLocTwo = transl(1.7, 1.6, 0.6)*trotx(pi);
-% spoonLocThree = transl(1.7, 1.35, 0.6)*trotx(pi);
-% forkLoc = transl(1.8, 1.4, 0.6)*trotx(pi);
-% forkLocTwo = transl(1.7, 1.65, 0.6)*trotx(pi);
-% forkLocThree = transl(1.75, 1.7, 0.6)*trotx(pi);
-% knifeLoc = transl(1.82, 1.6, 0.6)*trotx(pi);
-% knifeLocTwo = transl(1.73, 1.4, 0.6)*trotx(pi);
-% knifeLocThree = transl(1.71, 1.7, 0.6)*trotx(pi);
-
-spoonLoc = transl(1.7, 1.65, 0.6)*trotx(pi);
-spoonLocTwo = transl(1.7, 1.65, 0.6)*trotx(pi);
-spoonLocThree = transl(1.7, 1.65, 0.6)*trotx(pi);
-forkLoc = transl(1.7, 1.65, 0.6)*trotx(pi);
-forkLocTwo = transl(1.7, 1.65, 0.6)*trotx(pi);
-forkLocThree = transl(1.7, 1.65, 0.6)*trotx(pi);
-knifeLoc = transl(1.7, 1.65, 0.6)*trotx(pi);
-knifeLocTwo = transl(1.7, 1.65, 0.6)*trotx(pi);
-knifeLocThree = transl(1.7, 1.65, 0.6)*trotx(pi);
+        spoonLoc = transl(1.65, 1.5, 0.6)*trotx(pi);
+        spoonLocTwo = transl(1.6, 1.6, 0.6)*trotx(pi);
+        spoonLocThree = transl(1.65, 1.3, 0.6)*trotx(pi);
+        forkLoc = transl(1.75, 1.4, 0.6)*trotx(pi);
+        forkLocTwo = transl(1.6, 1.65, 0.6)*trotx(pi)*trotz(pi/2);
+        forkLocThree = transl(1.65, 1.7, 0.6)*trotx(pi);
+        knifeLoc = transl(1.6, 1.25, 0.6)*trotx(pi);
+        knifeLocTwo = transl(1.68, 1.35, 0.6)*trotx(pi);
+        knifeLocThree = transl(1.71, 1.7, 0.6)*trotx(pi);
+        containerOneLoc = transl(1.6, 1.4, 0.6)*trotx(pi);
+        containerTwoLoc = transl(1.5, 1.6, 0.6)*trotx(pi);
+        containerThreeLoc = transl(1.6, 1.8, 0.6)*trotx(pi);
 
 [spoonMesh, spoonVertexCount, spoonVerts] = PlotCutlery('Spoon.ply', spoonLoc(1,4), spoonLoc(2,4), spoonLoc(3,4));
 spoonMesh_h = spoonMesh; 
@@ -464,8 +457,8 @@ qKnife = robot.model.ikcon(knifeLoc);
 qKnifeTwo = robot.model.ikcon(knifeLocTwo);
 qKnifeThree = robot.model.ikcon(knifeLocThree);
 qContainerOne = robot.model.ikcon(containerOneLoc);
-qContainerTwo = robot.model.ikcon(containerTwoLoc*transl(0,0,0.2));
-qContainerThree = robot.model.ikcon(containerThreeLoc);
+qContainerTwo = robot.model.ikcon(containerTwoLoc*transl(0,0,-0.2));
+qContainerThree = robot.model.ikcon(containerThreeLoc*transl(0,0,0.25));
 %%
 qNew = [deg2rad(-20) deg2rad(260) pi/2 pi/2 2*pi 0];
 jacoMove(qNew, qContainerOne, robot);
