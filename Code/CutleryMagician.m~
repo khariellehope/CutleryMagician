@@ -356,7 +356,8 @@ end
 
 %figure(1)
 %plot3(x(1,:),x(2,:),x(3,:),'k.','LineWidth',1)
-robot.model.plot(qMatrix,'trail','r-')
+robot.model.plot(qMatrix);
+
 
 %%
 % Check workspace area
@@ -536,4 +537,39 @@ end
 
 robot.model.plot(qMatrix);
 
+%% Collision Detection
+
+startPoints = [];
+                for x = 0.8:0.1:1.4
+                    for y = 1.2
+                        for z = 0.7:0.05:0.9
+                            startPoints = [startPoints; x y z];
+                        end
+                        
+                    end
+                    
+                end
+                
+                finishPoints = [];
+                for x = 1.4:0.1:2.5
+                    for y = 1.2
+                        for z = 0.9:0.05:1.1
+                            finishPoints = [finishPoints; x y z];
+                        end
+                        
+                    end
+                    
+                end  
+                
+        qContainerOne = robot.model.ikcon(app.containerOneLoc);
+        display('Light Curtain Activated');
+        qStart = robot.model.getpos();
+        display('No collisions: Robot safely moving ~');
+        [statusFlag, handMesh_h] = jacoMoveTest(qStart, qContainerOne, app.robot, startPoints, finishPoints);
+        handMesh = handMesh_h;
+        if statusFlag == 1;
+          display('Collision Detected!!');
+          display('Robot has paused: Press Reset');
+        end
+%% Test Light Curtain
 

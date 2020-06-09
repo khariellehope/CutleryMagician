@@ -358,51 +358,6 @@ end
 %plot3(x(1,:),x(2,:),x(3,:),'k.','LineWidth',1)
 robot.model.plot(qMatrix);
 
-
-%%
-% Check workspace area
-% Want to see workspace area to see if all the items are within the arms
-% reach 
-% 
-% stepRads = deg2rad(3);
-% qlim = robot.model.qlim;
-% 
-% pointCloudeSize = prod(floor((qlim(1:5,2)-qlim(1:5,1))/stepRads +1))
-% pointCloud = zeros(pointCloudeSize,3);
-% counter = 1;
-% 
-% message = msgbox('Calculating Jaco workspace area');
-% 
-% for q1 = qlim(1,1):stepRads:qlim(1,2)
-%     for q2 = qlim(2,1):stepRads:qlim(2,2)
-%         for q3 = qlim(3,1):stepRads:qlim(3,2)
-%             for q4 = qlim(4,1):stepRads:qlim(4,2)
-%                 for q5 = qlim(5,1):stepRads:qlim(5,2)
-%                     for q6 = 0
-%                     q = [q1,q2,q3,q4,q5,q6];
-%                     tr = robot.model.fkine(q);
-%                     pointCloud(counter,:) = tr(1:3,4)';
-%                     counter = counter + 1;
-%                     end
-%                 end
-%             end
-%         end
-%     end
-% end
-% 
-% [maxReach, workspaceVol] = convhull(pointCloud);
-% 
-% hold on 
-% 
-% maxReach = plot3(pointCloud(maxReach,1),pointCloud(maxReach,2),pointCloud(maxReach,3),'r.');
-% 
-% 
-% msg = msgbox('Calculations complete, code paused');
-% 
-% pause();
-% delete(maxReach);
-
-
 %% Movement
 %Testing movement of arm from cutlery to containers. Will be changed to
 %switch cases when sensor is added 
@@ -466,7 +421,7 @@ objectMove(qKnifeThree, qContainerOne, robot, knifeVertsThree, knifeVertexCountT
 jacoMove(qContainerOne, qHomePose, robot);
 
 %% RMRC Testing
-
+% This is from Lab 9 Solution
 
 t = 1;
 deltaT = 0.02;
@@ -537,3 +492,45 @@ end
 
 robot.model.plot(qMatrix);
 
+%% Collision Detection
+
+startPoints = [];
+                for x = 0.8:0.1:1.4
+                    for y = 1.2
+                        for z = 0.7:0.05:0.9
+                            startPoints = [startPoints; x y z];
+                        end
+                        
+                    end
+                    
+                end
+                
+                finishPoints = [];
+                for x = 1.4:0.1:2.5
+                    for y = 1.2
+                        for z = 0.9:0.05:1.1
+                            finishPoints = [finishPoints; x y z];
+                        end
+                        
+                    end
+                    
+                end  
+                
+        qContainerOne = robot.model.ikcon(containerOneLoc);
+        display('Light Curtain Activated');
+        qStart = robot.model.getpos();
+        display('No collisions: Robot safely moving ~');
+        [statusFlag, handMesh_h] = jacoMoveTest(qStart, qContainerOne, app.robot, startPoints, finishPoints);
+        handMesh = handMesh_h;
+        if statusFlag == 1;
+          display('Collision Detected!!');
+          display('Robot has paused: Press Reset');
+        end
+%% Test Light Curtain
+
+qForcedCollision = robot.model.ikcon(forcedCollisionLoc);
+            flag = jacoMoveToCollision(qHomePose, qForcedCollision, robot, barrierMesh_h);
+            if flag == 1;
+                display('Collision Detected!!');
+                display('Robot has paused: Press Reset');
+            end
