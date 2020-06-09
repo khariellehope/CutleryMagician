@@ -55,28 +55,25 @@ containerOneLoc = transl(1.6, 1.4, 0.6)*trotx(pi);
 containerTwoLoc = transl(1.6, 1.6, 0.6)*trotx(pi);
 containerThreeLoc = transl(1.6, 1.8, 0.6)*trotx(pi);
 
-%ContainerOneLoc = transl(1.41, 1, 0.25);
 
 [partMesh, f, v] = Environment('Container1.ply', containerOneLoc(1,4), containerOneLoc(2,4), containerOneLoc(3,4));
 containerOneMesh_h = partMesh;
 containerOneFaces = f;
 containerOneVertices = v;
-% containerOneFN = containerOneMesh_h.FaceNormals;
 hold on;
 
 [partMesh, f, v] = Environment('Container2.ply', containerTwoLoc(1,4), containerTwoLoc(2,4), containerTwoLoc(3,4));
 containerTwoMesh_h = partMesh;
 containerTwoFaces = f;
 containerTwoVertices = v;
-% containerTwoFaceNorms = containerTwoMesh_h.FaceNormals;
 hold on;
 
 partMesh = Environment('Container3.ply', containerThreeLoc(1,4), containerThreeLoc(2,4), containerThreeLoc(3,4));
 containerThreeMesh_h = partMesh;
 containerThreeFaces = f;
 containerThreeVertices = v;
-% containerThreeFaceNorms = containerThreeMesh_h.FaceNormals;
 hold on;
+
 %%
 %Safety Features - i.e eStop, encasing, 
 eStopLoc = transl(2.6, 1.2, 0.6);            %Location needs to be fixed up, this is a random number5
@@ -91,26 +88,6 @@ wallLoc = transl(0.9, 2.1, 1.05);
 partMesh = Environment('Wall.ply', wallLoc(1,4), wallLoc(2,4), wallLoc(3,4));
 wallMesh_h = partMesh;
 hold on;
-
-%Barrier
-
-% partMesh = Environment('SafetyBarrier.ply', barrier1Loc(1,4), barrier1Loc(2,4), barrier1Loc(3,4));
-% barrierMesh_h = partMesh;
-% hold on;
-% 
-% partMesh = Environment('SafetyBarrier.ply', barrier2Loc(1,4), barrier2Loc(2,4), barrier2Loc(3,4));
-% barrier2Mesh_h = partMesh;
-% hold on;
-% 
-% %Barriers against wall
-% 
-% partMesh = Environment('SafetyBarrier2.ply', barrier3Loc(1,4), barrier3Loc(2,4), barrier3Loc(3,4));
-% barrier3Mesh_h = partMesh;
-% hold on;
-% 
-% partMesh = Environment('SafetyBarrier2.ply', barrier4Loc(1,4), barrier4Loc(2,4), barrier4Loc(3,4));
-% barrier4Mesh_h = partMesh;
-% hold on;
 
 %Light Curtain
 
@@ -365,28 +342,7 @@ end
 %plot3(x(1,:),x(2,:),x(3,:),'k.','LineWidth',1)
 robot.model.plot(qMatrix,'trail','r-')
 
-%% Collision avoidance?
-%if collision == 1, then stop robot, if =0; continue movement
-% collision checking should be done within movement section???? qMatrix
-% depends on the movement of robot
-qMatrix = deg2rad([-0.1745,5.4629,0.3316,-0.1745,2.4592,-0.1175]);           
-% centerpnt = [1.1,1,0.25];
-% side = 0.15;
-% plotOptions.plotFaces = true;
-% [Vertex,Faces,FaceNormals] = RectangularPrism(centerpnt-side/2, centerpnt+side/2,plotOptions);
- 
-collisionStatus = CheckForCollision(robot, qMatrix, benchMesh_h.Vertices, benchMesh_h.Faces, benchMesh_h.FaceNormals)
-if collisionStatus == 1
-  display('Collision Detected!!! Robot has paused');
-  while collisionStatus == 1
-  pause(1);
-  end
-  
-else
-    display('No collisions: Cutlery Magician safely moving~');
-    return
-end
-
+%%
 % Check workspace area
 % Want to see workspace area to see if all the items are within the arms
 % reach 
@@ -435,18 +391,6 @@ end
 %switch cases when sensor is added 
 %EE stands for end effector 
 
-steps = 50;
-s = lspb(0,1,steps); %Scalar function
-qMatrix = nan(steps, 6); %Memory allocation
-
-%Use this bit of code to animate movement. Replace q as required
-% for i = 1:steps
-%     qMatrix(i,:) = (1-s(i))*q + s(i)*q;
-%     robot.model.animate(qMatrix(i,:));
-% end
-
-%Pick up Spoon - HomePose to SpoonLoc, Spoon Loc to containerOne
-%
 qSpoon = robot.model.ikcon(spoonLoc);
 qSpoonTwo = robot.model.ikcon(spoonLocTwo);
 qSpoonThree = robot.model.ikcon(spoonLocThree);
@@ -473,19 +417,8 @@ forkThreeTr = robot.model.fkine(qForkThree);
 knifeTr = robot.model.fkine(qKnife);
 knifeTwoTr = robot.model.fkine(qKnifeTwo);
 knifeThreeTr = robot.model.fkine(qKnifeThree);
-%%
-            rmrc(homePoseTr, knifeLoc, robot);
-            rmrcObject(knifeTr, containerOneLoc, robot, knifeVerts, knifeVertexCount, knifeMesh_h);
-            %%
-            rmrc(containerOneTr, knifeLocTwo, robot);
-            rmrcObject(knifeTwoTr, containerOneLoc, robot, knifeVertsTwo, knifeVertexCountTwo, knifeMeshTwo_h);
-            %% 
-            rmrc(containerOneTr, knifeLocThree, robot);
-            rmrcObject(knifeThreeTr, containerOneLoc, robot, knifeVertsThree, knifeVertexCountThree, knifeMeshThree_h);
-           %%
-             rmrc(containerOneTr, homePose, app.robot);
-
-%%
+      
+%% 
 %Sort spoons:
 jacoMove(qHomePose, qSpoon, robot);
 objectMove(qSpoon, qContainerThree, robot, spoonVerts, spoonVertexCount, spoonMesh_h);
@@ -495,7 +428,7 @@ jacoMove(qContainerThree, qSpoonThree, robot);
 objectMove(qSpoonThree, qContainerThree, robot, spoonVertsThree, spoonVertexCountThree, spoonMeshThree_h);
 jacoMove(qContainerThree, qHomePose, robot);
 %
-%%
+
 %%
 %Sort forks:
 jacoMove(qHomePose, qFork, robot);
@@ -514,31 +447,8 @@ objectMove(qKnifeTwo, qContainerOne, robot, knifeVertsTwo, knifeVertexCountTwo, 
 jacoMove(qContainerOne, qKnifeThree, robot);
 objectMove(qKnifeThree, qContainerOne, robot, knifeVertsThree, knifeVertexCountThree, knifeMeshThree_h);
 jacoMove(qContainerOne, qHomePose, robot);
-%%
-for i = 1:steps
-    qMatrix(i,:) = (1-s(i))*qHomePose + s(i)*qSpoon;
-    robot.model.animate(qMatrix(i,:));
-end
 
-
-for i = 1:steps
-    qMatrix(i,:) = (1-s(i))*qSpoon + s(i)*qContainerThree;
-    robot.model.animate(qMatrix(i,:));
-    
-    %Spoon model being brought to container    
-    spoonEE = robot.model.fkine(qMatrix(i,:))*transl(0, 0, 0.05);
-    spoonUpdatedPoints = [spoonEE*[spoonVerts,ones(spoonVertexCount,1)]']';
-    spoonMesh_h.Vertices = spoonUpdatedPoints(:,1:3);
-end
-
-%Return to Home
-
-for i = 1:steps
-    qMatrix(i,:) = (1-s(i))*qContainerThree + s(i)*qHomePose;
-    robot.model.animate(qMatrix(i,:));
-end
-
-%% HI MONICA HERES RMRC
+%% RMRC Testing
 
 
 t = 1;
@@ -610,170 +520,4 @@ end
 
 robot.model.plot(qMatrix);
 
-%%
-ForcedCollisionLoc = transl(1.4, 2.5, 0.9)*trotx(pi);
-qForcedCollision = robot.model.ikcon(ForcedCollisionLoc);
-qStart = [pi/2 pi deg2rad(341) pi/2 2*pi 0];
-% statusFlag = 0;
-% steps = 50;
-% s = lspb(0,1,steps); %Scalar function
-% qMatrix = nan(steps, 6); %Memory allocation
 
-% qMatrix = robot.model.getpos();
-% collisionStatus = CheckForCollision(robot, qMatrix, wallMesh_h.Vertices, wallMesh_h.Faces, wallMesh_h.FaceNormals) 
-%     if collisionStatus == 1
-%       display("robot collision");
-%         
-%               
-%      end
-
-% for i = 1:2:steps
-%     
-%     qMatrix(i,:) = (1-s(i))*qStart + s(i)*qForcedCollision;
-%     %transform = robot.model.fkine(qMatrix(i,:));
-%     qCurrent = robot.model.getpos();
-%     collisionStatus = CheckForCollision(robot, qCurrent, wallMesh_h.Vertices, wallMesh_h.Faces, wallMesh_h.FaceNormals) 
-%     if collisionStatus == 1
-%       display("robot collision");
-%         
-%               
-%      end
-%     robot.model.animate(qMatrix(i,:));
-% end
-
-
-statusFlag = jacoMoveToCollision(qStart,qForcedCollision,robot, wallMesh_h);
-if statusFlag == 1
-    display("noooo staoooop");
-    pause();
-end
-
-%%
-qStart = qHomePose;
-qFinish = robot.model.ikcon(containerThreeLoc);
-faces = wallMesh_h.Faces;
-vertex = wallMesh_h.Vertices;
-faceNormals = wallMesh_h.FaceNormals;
-
-robot.model.animate(qStart);
-qWaypoints = [qStart;qFinish];
-CheckForCollision = true;
-checkedTillWaypoint = 1;
-qMatrix = [];
-while (CheckForCollision)
-    startWaypoint = checkedTillWaypoint;
-    for i = startWaypoint:size(qWaypoints,1)-1
-        qMatrixJoin = InterpolateWaypointRadians(qWaypoints(i:i+1,:),deg2rad(10));
-        if ~CheckForCollision(robot,qMatrixJoin,faces,vertex,faceNormals)
-            qMatrix = [qMatrix; qMatrixJoin]; %#ok<AGROW>
-            robot.model.animate(qMatrixJoin);
-            size(qMatrix)
-            CheckForCollision = false;
-            checkedTillWaypoint = i+1;
-            % Now try and join to the final goal (q2)
-            qMatrixJoin = InterpolateWaypointRadians([qMatrix(end,:); q2],deg2rad(10));
-            if ~IsCollision(robot,qMatrixJoin,faces,vertex,faceNormals)
-                qMatrix = [qMatrix;qMatrixJoin];
-                % Reached goal without collision, so break out
-                break;
-            end
-        else
-            % Randomly pick a pose that is not in collision
-            qRand = (2 * rand(1,3) - 1) * pi;
-            while checkForCollision(robot,qRand,faces,vertex,faceNormals)
-                qRand = (2 * rand(1,3) - 1) * pi;
-            end
-            qWaypoints =[ qWaypoints(1:i,:); qRand; qWaypoints(i+1:end,:)];
-            CheckForCollision = true;
-            break;
-        end
-    end
-end
-robot.model.animate(qMatrix)
-
-%% IsCollision
-% This is based upon the output of questions 2.5 and 2.6
-% Given a robot model (robot), and trajectory (i.e. joint state vector) (qMatrix)
-% and triangle obstacles in the environment (faces,vertex,faceNormals)
-function result = IsCollision(robot,qMatrix,faces,vertex,faceNormals,returnOnceFound)
-if nargin < 6
-    returnOnceFound = true;
-end
-result = false;
-
-for qIndex = 1:size(qMatrix,1)
-    % Get the transform of every joint (i.e. start and end of every link)
-    tr = GetLinkPoses(qMatrix(qIndex,:), robot);
-
-    % Go through each link and also each triangle face
-    for i = 1 : size(tr,3)-1    
-        for faceIndex = 1:size(faces,1)
-            vertOnPlane = vertex(faces(faceIndex,1)',:);
-            [intersectP,check] = LinePlaneIntersection(faceNormals(faceIndex,:),vertOnPlane,tr(1:3,4,i)',tr(1:3,4,i+1)'); 
-            if check == 1 && IsIntersectionPointInsideTriangle(intersectP,vertex(faces(faceIndex,:)',:))
-                plot3(intersectP(1),intersectP(2),intersectP(3),'g*');
-                display('Intersection');
-                result = true;
-                if returnOnceFound
-                    return
-                end
-            end
-        end    
-    end
-end
-end
-
-%% GetLinkPoses
-% q - robot joint angles
-% robot -  seriallink robot model
-% transforms - list of transforms
-function [ transforms ] = GetLinkPoses( q, robot)
-transforms = zeros(4,4,robot.model.n+1);
-    transforms(:,:,1) = robot.model.base;
-    Links = robot.model.links;
-    for i = 1 : robot.model.n
-        transforms(:,:,i+1) = transforms(:,:,i) * trotz(q(i)+Links(i).offset) * transl(0,0,Links(i).d) * transl(Links(i).a,0,0) * trotx(Links(i).alpha);
-    end
-% links = robot.model.links;
-% transforms = zeros(4, 4, length(links) + 1);
-% transforms(:,:,1) = robot.model.base;
-% 
-% for i = 1:length(links)
-%     L = links(1,i);
-%     
-%     current_transform = transforms(:,:, i);
-%     
-%     current_transform = current_transform * trotz(q(1,i) + L.offset) * ...
-%     transl(0,0, L.d) * transl(L.a,0,0) * trotx(L.alpha);
-%     transforms(:,:,i + 1) = current_transform;
-% end
-end
-
-%% FineInterpolation
-% Use results from Q2.6 to keep calling jtraj until all step sizes are
-% smaller than a given max steps size
-function qMatrix = FineInterpolation(q1,q2,maxStepRadians)
-if nargin < 3
-    maxStepRadians = deg2rad(1);
-end
-    
-steps = 2;
-while ~isempty(find(maxStepRadians < abs(diff(jtraj(q1,q2,steps))),1))
-    steps = steps + 1;
-end
-qMatrix = jtraj(q1,q2,steps);
-end
-
-%% InterpolateWaypointRadians
-% Given a set of waypoints, finely intepolate them
-function qMatrix = InterpolateWaypointRadians(waypointRadians,maxStepRadians)
-if nargin < 2
-    maxStepRadians = deg2rad(1);
-end
-
-qMatrix = [];
-for i = 1: size(waypointRadians,1)-1
-    qMatrix = [qMatrix ; FineInterpolation(waypointRadians(i,:),waypointRadians(i+1,:),maxStepRadians)]; %#ok<AGROW>
-end
-end
-%%
