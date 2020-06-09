@@ -459,10 +459,31 @@ qKnifeThree = robot.model.ikcon(knifeLocThree);
 qContainerOne = robot.model.ikcon(containerOneLoc);
 qContainerTwo = robot.model.ikcon(containerTwoLoc*transl(0,0,-0.2));
 qContainerThree = robot.model.ikcon(containerThreeLoc*transl(0,0,0.25));
-%%
-qNew = [deg2rad(-20) deg2rad(260) pi/2 pi/2 2*pi 0];
-jacoMove(qNew, qContainerOne, robot);
 
+homePoseTr = robot.model.fkine(qHomePose);
+containerOneTr = robot.model.fkine(qContainerOne);
+containerTwoTr = robot.model.fkine(qContainerTwo);
+containerThreeTr = robot.model.fkine(qContainerThree);
+spoonTr = robot.model.fkine(qSpoon);
+spoonTwoTr = robot.model.fkine(qSpoonTwo);
+spoonThreeTr = robot.model.fkine(qSpoonThree);
+forkTr = robot.model.fkine(qFork);
+forTwoTr = robot.model.fkine(qForkTwo);
+forkThreeTr = robot.model.fkine(qForkThree);
+knifeTr = robot.model.fkine(qKnife);
+knifeTwoTr = robot.model.fkine(qKnifeTwo);
+knifeThreeTr = robot.model.fkine(qKnifeThree);
+%%
+            rmrc(homePoseTr, knifeLoc, robot);
+            rmrcObject(knifeTr, containerOneLoc, robot, knifeVerts, knifeVertexCount, knifeMesh_h);
+            %%
+            rmrc(containerOneTr, knifeLocTwo, robot);
+            rmrcObject(knifeTwoTr, containerOneLoc, robot, knifeVertsTwo, knifeVertexCountTwo, knifeMeshTwo_h);
+            %% 
+            rmrc(containerOneTr, knifeLocThree, robot);
+            rmrcObject(knifeThreeTr, containerOneLoc, robot, knifeVertsThree, knifeVertexCountThree, knifeMeshThree_h);
+           %%
+             rmrc(containerOneTr, homePose, app.robot);
 
 %%
 %Sort spoons:
@@ -753,4 +774,4 @@ for i = 1: size(waypointRadians,1)-1
     qMatrix = [qMatrix ; FineInterpolation(waypointRadians(i,:),waypointRadians(i+1,:),maxStepRadians)]; %#ok<AGROW>
 end
 end
-
+%%
