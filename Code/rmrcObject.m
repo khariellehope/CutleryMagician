@@ -1,4 +1,7 @@
 function rmrc(startTr, finalLoc, robot, Verts, VertexCount, mesh)
+
+%From Lab 9 Solution
+
 t = 1;
 deltaT = 0.02;
 steps = t/deltaT;
