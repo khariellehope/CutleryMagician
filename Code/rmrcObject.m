@@ -1,4 +1,4 @@
-function rmrc(startTr, finalLoc, robot)
+function rmrc(startTr, finalLoc, robot, Verts, VertexCount, mesh)
 t = 1;
 deltaT = 0.02;
 steps = t/deltaT;
@@ -58,5 +58,7 @@ for i = 1:steps-1
     angleError(:,i) = deltaTheta;                                           % For plotting
 end
 robot.model.plot(qMatrix);
-
+EE = robot.model.fkine(qMatrix(i,:));
+UpdatedPoints = [EE*[Verts,ones(VertexCount,1)]']';
+mesh.Vertices = UpdatedPoints(:,1:3);
 end
