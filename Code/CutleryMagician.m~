@@ -356,8 +356,7 @@ end
 
 %figure(1)
 %plot3(x(1,:),x(2,:),x(3,:),'k.','LineWidth',1)
-robot.model.plot(qMatrix);
-
+robot.model.plot(qMatrix,'trail','r-')
 
 %%
 % Check workspace area
