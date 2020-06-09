@@ -205,28 +205,28 @@ rmrcObject(spoonTr, containerThreeLoc, robot, spoonVerts, spoonVertexCount, spoo
 jacoMove(qContainerThree, qSpoonTwo, robot);
 rmrcObject(spoonTwoTr, containerThreeLoc, robot, spoonVertsTwo, spoonVertexCountTwo, spoonMeshTwo_h);
 jacoMove(qContainerThree, qSpoonThree, robot);
-rmrcObject(spoonThreeTr, containerThreeLoc, robot, spoonVertsThree, spoonVertexCountThree, spoonMeshThree_h);
+rmrcObject(spoonTwoTr, containerThreeLoc, robot, spoonVertsThree, spoonVertexCountThree, spoonMeshThree_h);
 jacoMove(qContainerThree, qHomePose, robot);
 
 
 %%
 %Sort forks:
 jacoMove(qHomePose, qFork, robot);
-rmrcObject(forkTr, containerTwoLoc, robot, forkVerts, forkVertexCount, forkMesh_h);
+rmrcObject(qFork, qContainerTwo, robot, forkVerts, forkVertexCount, forkMesh_h);
 jacoMove(qContainerTwo, qForkTwo, robot);
-rmrcObject(forkTwoTr, containerTwoLoc, robot, forkVertsTwo, forkVertexCountTwo, forkMeshTwo_h);
+rmrcObject(qForkTwo, qContainerThree, robot, forkVertsTwo, forkVertexCountTwo, forkMeshTwo_h);
 jacoMove(qContainerTwo, qForkThree, robot);
-rmrcObject(forkThreeTr, containerTwoLoc, robot, forkVertsThree, forkVertexCountThree, forkMeshThree_h);
+rmrcObject(qForkThree, qContainerTwo, robot, forkVertsThree, forkVertexCountThree, forkMeshThree_h);
 jacoMove(qContainerTwo, qHomePose, robot);
 
 %%
 %Sort Knives:
 jacoMove(qHomePose, qKnife, robot);
-rmrcObject(knifeTr, containerOneLoc, robot, knifeVerts, knifeVertexCount, knifeMesh_h);
+rmrcObject(qKnife, qContainerOne, robot, knifeVerts, knifeVertexCount, knifeMesh_h);
 jacoMove(qContainerOne, qKnifeTwo, robot);
-rmrcObject(knifeTwoTr, containerOneLoc, robot, knifeVertsTwo, knifeVertexCountTwo, knifeMeshTwo_h);
+rmrcObject(qKnifeTwo, qContainerOne, robot, knifeVertsTwo, knifeVertexCountTwo, knifeMeshTwo_h);
 jacoMove(qContainerOne, qKnifeThree, robot);
-rmrcObject(knifeThreeTr, containerOneLoc, robot, knifeVertsThree, knifeVertexCountThree, knifeMeshThree_h);
+rmrcObject(qKnifeThree, qContainerOne, robot, knifeVertsThree, knifeVertexCountThree, knifeMeshThree_h);
 jacoMove(qContainerOne, qHomePose, robot);
 
 %% Visual Servoing
