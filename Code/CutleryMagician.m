@@ -16,6 +16,10 @@
 %
 %       Safety Sign
 %       https://au.rs-online.com/web/p/warning-signs/8578719/
+%
+%
+%           ---- Various Robotics Lab Solutions were used throughout the
+%           code and are referenced at the top of functions ------
 %       
 
 
@@ -28,6 +32,7 @@ set(0,'DefaultFigureWindowStyle','docked');
 % Model Jaco arm
 
 jacoBase = transl(2.3, 1.85, 0.7);
+homeLoc = transl(2.3, 1.85, 0.7);
 qHomePose = [pi/2 pi deg2rad(341) pi/2 2*pi 0];                  %Change joint angles accordingly
 %qTest = deg2rad([-0.1466,5.4629,3.6849,0,3.1416,0]); 
 %Get robot arm 
@@ -200,34 +205,34 @@ knifeThreeTr = robot.model.fkine(qKnifeThree);
       
 %% 
 %Sort spoons:
-jacoMove(qHomePose, qSpoon, robot);
-rmrcObject(spoonTr, containerThreeLoc, robot, spoonVerts, spoonVertexCount, spoonMesh_h);
-jacoMove(qContainerThree, qSpoonTwo, robot);
-rmrcObject(spoonTwoTr, containerThreeLoc, robot, spoonVertsTwo, spoonVertexCountTwo, spoonMeshTwo_h);
-jacoMove(qContainerThree, qSpoonThree, robot);
-rmrcObject(spoonThreeTr, containerThreeLoc, robot, spoonVertsThree, spoonVertexCountThree, spoonMeshThree_h);
-jacoMove(qContainerThree, qHomePose, robot);
+rmrc(homePoseTr, spoonLoc, robot);
+objectMove(qSpoon, qContainerThree, robot, spoonVerts, spoonVertexCount, spoonMesh_h);
+rmrc(containerThreeTr, spoonLocTwo, robot);
+objectMove(qSpoonTwo, qContainerThree, robot, spoonVertsTwo, spoonVertexCountTwo, spoonMeshTwo_h);
+rmrc(containerThreeTr, spoonLocThree, robot);
+objectMove(qSpoonThree, qContainerThree, robot, spoonVertsThree, spoonVertexCountThree, spoonMeshThree_h);
+rmrc(containerThreeTr, homeLoc, robot);
 
 
 %%
 %Sort forks:
-jacoMove(qHomePose, qFork, robot);
-rmrcObject(forkTr, containerTwoLoc, robot, forkVerts, forkVertexCount, forkMesh_h);
-jacoMove(qContainerTwo, qForkTwo, robot);
-rmrcObject(forkTwoTr, containerTwoLoc, robot, forkVertsTwo, forkVertexCountTwo, forkMeshTwo_h);
-jacoMove(qContainerTwo, qForkThree, robot);
-rmrcObject(forkThreeTr, containerTwoLoc, robot, forkVertsThree, forkVertexCountThree, forkMeshThree_h);
-jacoMove(qContainerTwo, qHomePose, robot);
+rmrc(homePoseTr, forkLoc, robot);
+objectMove(qFork, qContainerTwo, robot, forkVerts, forkVertexCount, forkMesh_h);
+rmrc(containerTwoTr, forkLocTwo, robot);
+objectMove(qForkTwo, qContainerTwo, robot, forkVertsTwo, forkVertexCountTwo, forkMeshTwo_h);
+rmrc(containerTwoTr, forkLocThree, robot);
+objectMove(qForkThree, qContainerTwo, robot, forkVertsThree, forkVertexCountThree, forkMeshThree_h);
+rmrc(containerTwoTr, homeLoc, robot);
 
 %%
 %Sort Knives:
-jacoMove(qHomePose, qKnife, robot);
-rmrcObject(knifeTr, containerOneLoc, robot, knifeVerts, knifeVertexCount, knifeMesh_h);
-jacoMove(qContainerOne, qKnifeTwo, robot);
-rmrcObject(knifeTwoTr, containerOneLoc, robot, knifeVertsTwo, knifeVertexCountTwo, knifeMeshTwo_h);
-jacoMove(qContainerOne, qKnifeThree, robot);
-rmrcObject(knifeThreeTr, containerOneLoc, robot, knifeVertsThree, knifeVertexCountThree, knifeMeshThree_h);
-jacoMove(qContainerOne, qHomePose, robot);
+rmrc(homePoseTr, knifeLoc, robot);
+objectMove(qKnife, qContainerOne, robot, knifeVerts, knifeVertexCount, knifeMesh_h);
+rmrc(containerOneTr, knifeLocTwo, robot);
+objectMove(qKnifeTwo, qContainerOne, robot, knifeVertsTwo, knifeVertexCountTwo, knifeMeshTwo_h);
+rmrc(containerOneTr, knifeLocThree, robot);
+robjectMove(qKnifeThree, qContainerOne, robot, knifeVertsThree, knifeVertexCountThree, knifeMeshThree_h);
+rmrc(containerOneTr, homeLoc, robot);
 
 %% Visual Servoing
 
