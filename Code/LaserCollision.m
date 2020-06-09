@@ -11,7 +11,7 @@ lightCurtainStatus = 0;            %Set status flag as 0 first - Without this, t
     for i = 1 : size(startPoints,1)    
         for faceIndex = 1:size(faces,1)
             vertOnPlane = vertex(faces(faceIndex,1)',:);
-            [intersectP, check] = LinePlaneIntersection(faceNormals(faceIndex,:),vertOnPlane,startPoints(i,:),finishPoints(i,:)); 
+            [intersectP, check] = LinePlaneIntersection(faceNormals(faceIndex,:),vertOnPlane,startPoints(i,:),finishPoints(i,:)); %This function requires a normal & point, and 2 points on a line
             if check == 1 && IsIntersectionPointInsideTriangle(intersectP,vertex(faces(faceIndex,:)',:))
                 %plot3(intersectP(1),intersectP(2),intersectP(3),'b*');
                 display('Intersection');

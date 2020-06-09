@@ -8,7 +8,7 @@ classdef Jaco < handle
     
     methods
         %self = creating a function for the rest of the methods to refer
-        %to: ie self = Dobot class
+        %to: ie self = Jaco class
         
          function self = Jaco(toolModelAndTCPFilenames)
               if nargin > 0

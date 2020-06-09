@@ -2,17 +2,17 @@ function [statusFlag, handMesh_h] = jacoMoveTest(qStart,qFinish,robot, startPoin
 
 statusFlag =0;
 steps = 50;
-s = lspb(0,1,steps); %Scalar function
-qMatrix = nan(steps, 6); %Memory allocation
+s = lspb(0,1,steps);            %Scalar function
+qMatrix = nan(steps, 6);        %Memory allocation
 handLoc = transl(1.5, 0.5, 0.8);
 handPose = handLoc;
-forwardTR = makehgtform('translate',[0,0.04,0]);
+forwardTR = makehgtform('translate',[0,0.04,0]);    %translate hand model forward by 0.04 in the y direction
 
 [handMesh, VertexCount, Verts] = PlotCutlery('hand2.ply', handLoc(1,4), handLoc(2,4), handLoc(3,4));
 handMesh_h = handMesh;
 handVerts = Verts;
 handVertexCount = VertexCount;
-%
+
 % handFaceNormals = zeros(size(handMesh_h.Faces,1),3);
 %     for faceIndex = 1:size(handMesh_h.Faces,1)
 %         v1 = handMesh_h.Vertices(handMesh_h.Faces(faceIndex,1)',:);
@@ -23,15 +23,15 @@ handVertexCount = VertexCount;
 
 
 for i = 1:3:steps
-    qMatrix(i,:) = (1-s(i))*qStart + s(i)*qFinish;
-    %transform = robot.model.fkine(qMatrix(i,:));
+    qMatrix(i,:) = (1-s(i))*qStart + s(i)*qFinish;              %Tra[ezpodal method to plan trajectory
+    %transform = robot.model.fkine(qMatrix(i,:));               
     robot.model.animate(qMatrix(i,:));
     handPose = handPose*forwardTR;
-    updatedPoints = [handPose * [handVerts,ones(handVertexCount,1)]']';
+    updatedPoints = [handPose * [handVerts,ones(handVertexCount,1)]']';   % As robot moves along its trajectory, hand should also move towards curtain  
     handMesh_h.Vertices = updatedPoints(:,1:3);
     drawnow();   
     lightCurtainStatus = LaserCollision(startPoints, finishPoints, handMesh_h.Vertices, handMesh_h.Faces, handMesh_h.FaceNormals); 
-    if lightCurtainStatus == 1
+    if lightCurtainStatus == 1          %If LaserCollisionFunction detects a collision, set the flag to 1
       
       statusFlag = 1;
       return

@@ -1,3 +1,14 @@
+%-----------------------------Reference List -------------------%
+% Ply Model Files:
+%       Simulated Hand OBJ files:
+%       https://free3d.com/3d-model/freerealsichand-85561.html (Free3D)
+%       
+%       Kitchen Bench:
+%
+%       Cutlery (Spoons, Forks, Knives):
+%
+
+
 clc
 clf
 clear all

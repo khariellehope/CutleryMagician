@@ -1,16 +1,16 @@
-function [collisionStatus, transform] = CheckForCollision(robot, qMatrix, vertex, faces, faceNormals, returnOnceFound) %Checks for collisions with containers
-%This part of the code was made using code from Lab 5 Solutions and the
-%IsCollision.m file
+function [collisionStatus, transform] = CheckForCollision(robot, qMatrix, vertex, faces, faceNormals, returnOnceFound) %Checks for collisions with Environment
+%This part of the code was made using code from Lab 5 Solutions and the IsCollision.m file
 
 if nargin < 6
     returnOnceFound = true;
 end
-collisionStatus = 0;            %Set status flag as 0 first - Without this, the flag was always 
+collisionStatus = 0;            %Set status flag as 0 first - Without this, flag value output was always 0
 
 for qIndex = 1:size(qMatrix,1)
 
-    % Get the transform of every joint (i.e. start and end of every link)  
-%     tr = GetLinkPoses(qMatrix(qIndex,:), robot);
+    % Get the transform of every joint (i.e. start and end of every link)
+    % on the robot to pass into LinePlaneIntersection
+    % tr = GetLinkPoses(qMatrix(qIndex,:), robot);
     transform = zeros(4,4,robot.model.n+1);
     transform(:,:,1) = robot.model.base;
     Links = robot.model.links;
@@ -19,7 +19,7 @@ for qIndex = 1:size(qMatrix,1)
     end
 
     % Go through each link and also each triangle face
-    for i = 1 : size(transform,3)-1    
+    for i = 1 : size(transform,3)-1             %Goes through the transforms of the joints
         for faceIndex = 1:size(faces,1)
             vertOnPlane = vertex(faces(faceIndex,1)',:);
             [intersectP,check] = LinePlaneIntersection(faceNormals(faceIndex,:),vertOnPlane,transform(1:3,4,i)',transform(1:3,4,i+1)'); 
