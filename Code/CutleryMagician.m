@@ -537,4 +537,3 @@ end
 
 robot.model.plot(qMatrix);
 
-
