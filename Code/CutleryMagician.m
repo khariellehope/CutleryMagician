@@ -603,7 +603,9 @@ for i = 1:steps-1
     end
     qMatrix(i+1,:) = qMatrix(i,:) + deltaT*qdot(i,:);                         	% Update next joint state based on joint velocities
     positionError(:,i) = x(:,i+1) - T(1:3,4);                               % For plotting
-    angleError(:,i) = deltaTheta;                                           % For plotting
+    angleError(:,i) = deltaTheta;  % For plotting  
+    robot.model.plot(qMatrix);
+    
 end
 
 robot.model.plot(qMatrix);
