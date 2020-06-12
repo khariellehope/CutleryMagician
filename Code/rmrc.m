@@ -30,7 +30,7 @@ for i=1:steps
 end
 qMatrix(1,:) = robot.model.ikcon(T1, q);
 for i = 1:steps-1
-    T = robot.model.fkine(qMatrix(i,:));                                           % Get forward transformation at current joint state
+    T = robot.model.fkine(qMatrix(i,:));                                    % Get forward transformation at current joint state
     deltaX = x(:,i+1) - T(1:3,4);                                         	% Get position error from next waypoint
     Rd = rpy2r(theta(1,i+1),theta(2,i+1),theta(3,i+1));                     % Get next RPY angles, convert to rotation matrix
     Ra = T(1:3,1:3);                                                        % Current end-effector rotation matrix
@@ -40,7 +40,7 @@ for i = 1:steps-1
     angular_velocity = [S(3,2);S(1,3);S(2,1)];                              % Check the structure of Skew Symmetric matrix!!
     deltaTheta = tr2rpy(Rd*Ra');                                            % Convert rotation matrix to RPY angles
     xdot = W*[linear_velocity;angular_velocity];                          	% Calculate end-effector velocity to reach next waypoint.
-    J = robot.model.jacob0(qMatrix(i,:));                 % Get Jacobian at current joint state
+    J = robot.model.jacob0(qMatrix(i,:));                                   % Get Jacobian at current joint state
     m(i) = sqrt(det(J*J'));
     if m(i) < epsilon  % If manipulability is less than given threshold
         lambda = (1 - m(i)/epsilon)*5E-2;

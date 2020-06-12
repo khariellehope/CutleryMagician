@@ -1,12 +1,13 @@
 function []= VisualServoing()
 
 %From Lab 8 Solution
-pWarning = [310 510 610; 610 250 620];
-targetPoints = [0.8 0.8 0.8;
+pWarning = [310 510 610; 610 250 620]; %points to make triangle shape in camera view; asterisks are the desired points,
+targetPoints = [0.8 0.8 0.8;  %points in the actual environment;
     1.35 1.5 1.65; 
     1.1 01.5 1.1];
 %qInitial = [0 pi deg2rad(341) deg2rad(200) -pi/2 pi];
-qInitial = [0 pi pi deg2rad(-238) deg2rad(133) deg2rad(150)];
+qInitial = [0 pi pi deg2rad(-238) deg2rad(133) deg2rad(150)];       %to have robot look at the warning sign/have it in view
+
 cam = CentralCamera('focal', 0.08', 'pixel', 10e-5, ...
     'resolution', [1024 1024], 'centre', [500 500], 'name', 'CM Cam');
 fps = 100;
